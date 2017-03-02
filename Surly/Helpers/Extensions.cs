@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Schema;
+using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Helpers
 {
@@ -12,7 +12,7 @@ namespace Surly.Helpers
             switch (typeName.ToLower())
             {
                 case "char":
-                    return typeof(char);
+                    return typeof(string);
 
                 case "num":
                     return typeof(int);
@@ -70,6 +70,23 @@ namespace Surly.Helpers
             return result
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .ToArray();
+        }
+
+        public static dynamic To<T>(this T source, Type destination, int max)
+        {
+            if (destination == typeof(string))
+            {
+                if (source.ToString().Length > max) return SizeError(source, max);
+                var test = Convert.ChangeType(source, destination);
+                return test;
+            }
+            return source;
+        }
+
+        private static object SizeError(object source, int max)
+        {
+            WriteLine($"Error: {source} length was {source.ToString().Length}, maximum allowed is {max}. Trimming...", Color.Red);
+            return source.ToString().Substring(0, max);
         }
     }
 }

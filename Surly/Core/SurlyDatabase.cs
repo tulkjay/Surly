@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Core
 {
-    //The database is a singleton
+    //This database is a singleton
     public class SurlyDatabase
     {
         private static SurlyDatabase _instance;
@@ -23,34 +21,38 @@ namespace Surly.Core
 
         public void PrintCatalog()
         {
+            const string id = "Id";
             Console.WriteLine("\nPrinting tables");
 
             foreach (var table in Tables)
             {
                 WriteLine($"\n\tTable: {table.Name}");
-
                 Console.WriteLine();
 
-                const string id = "Id";
-
-                Console.Write(id.PadRight(5));
+                Console.Write($"  {id.PadRight(8)}");
 
                 foreach (var tuple in table.Schema)
                 {
                     Console.Write($"{tuple.Name.PadRight(12)}");
                 }
+
                 var count = 1;
 
                 WriteLine("\n" + string.Empty.PadRight(100, '='), Color.Green);
 
                 Set(Color.Yellow);
+
                 foreach (var tableTuple in table.Tuples)
                 {
-                    Console.Write($"\n{count.ToString().PadRight(5)}");
+                    Console.Write($"  {count.ToString().PadRight(8)}");
+
                     foreach (var attribute in tableTuple)
                     {
                         Console.Write($"{attribute.Value.ToString().PadRight(12)}");
                     }
+
+                    Console.WriteLine();
+
                     count++;
                 }
                 Console.WriteLine();

@@ -52,8 +52,11 @@ namespace Surly.Helpers
             {
                 case "relation":
                     Console.WriteLine("Creating table: " + steps[1] + "\n");
+
                     Set(Color.Cyan);
+
                     CreateTable(steps[1], line);
+
                     Set(Color.Magenta);
                     break;
 
@@ -62,12 +65,15 @@ namespace Surly.Helpers
                     Set(Color.Cyan);
 
                     AddTuples(steps[1], line);
+
                     Set(Color.Magenta);
                     break;
 
                 case "print":
                     Set(Color.Cyan);
+
                     Database.PrintCatalog();
+
                     Set(Color.Magenta);
                     break;
 
@@ -121,28 +127,21 @@ namespace Surly.Helpers
         {
             var tuples = string.Format(new SurlyFormatter(), "{0:insert}", line).SplitValues();
             var table = Database.Tables.Single(x => x.Name == tableName);
-            var schema = table.Schema;
+            var schema = table.Schema.ToArray();
 
             WriteRow(tuples.ToList(), "\tParsed: ", Color.Blue);
+
             var newTuple = new LinkedList<SurlyAttribute>();
 
-            for (var i = 0; i < schema.Count; i++)
+            for (var i = 0; i < schema.Length; i++)
             {
-                newTuple.AddLast(new SurlyAttribute { Value = tuples[i] });
+                newTuple.AddLast(new SurlyAttribute { Value = tuples[i].To(schema[i].Type, schema[i].Maximum) });
             }
 
             if (newTuple.Count > 0) table.Tuples.AddLast(newTuple);
-
-            //var test = schema.Zip(tuples, (schemaItem, tuple) =>
-            //{
-            //    Console.WriteLine($"Trying to save {tuple} in {schemaItem.Name} as {schemaItem.Type}, which has a max of {schemaItem.Maximum}.");
-            //    var item = new SurlyAttribute { Value = tuple };
-            //    return item;
-            //});
-
-            //table.Tuples = SurlyZip(schema, tuples);    //May not be necessary to create a recursive aggregator.
         }
 
+        //It may not be necessary to create a recursive aggregator.
         public static LinkedList<LinkedList<SurlyTuple>> SurlyZip(LinkedList<SurlyAttributeSchema> schema, params object[] items)
         {
             Set(Color.Yellow);
