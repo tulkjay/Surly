@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Surly.Helpers
 {
@@ -59,6 +60,19 @@ namespace Surly.Helpers
                               "\t\tYou are thusly a guest to the surliest database under the sun! Begin..." +
                               "\n\n");
             Set(Color.Cyan);
+        }
+
+        public static void WriteRow(List<string> dataList, string startString, Color textColor = Color.Magenta, Color postTextColor = Color.Cyan)
+        {
+            Set(textColor);
+
+            Console.Write(startString);
+
+            dataList.ForEach(x => Console.Write($"{x} "));
+
+            Console.WriteLine();
+
+            Set(postTextColor);
         }
     }
 }

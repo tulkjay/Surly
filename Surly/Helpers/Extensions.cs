@@ -22,6 +22,24 @@ namespace Surly.Helpers
 
         public static string[] SplitValues(this string text, char delimiter = ' ')
         {
+            //Parse out strings wrapped with single quotes
+            if (text.Contains("'")) return SplitWithStrings(text, delimiter);
+
+            var result = new List<string>();
+
+            text.Split(delimiter)
+                .ToList()
+                .ForEach(x => result.Add(x.Replace(";", "")));
+
+            var test = result
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToArray();
+
+            return test;
+        }
+
+        private static string[] SplitWithStrings(string text, char delimiter)
+        {
             var result = new List<string>();
 
             while (text.Contains("'"))

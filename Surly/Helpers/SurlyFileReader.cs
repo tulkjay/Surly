@@ -10,6 +10,7 @@ namespace Surly.Helpers
     public class SurlyFileReader
     {
         public SurlyDatabase Database = SurlyDatabase.GetInstance();
+        private string _repeatedTableName = string.Empty;
 
         public void ParseFile(string filePath)
         {
@@ -43,6 +44,9 @@ namespace Surly.Helpers
         {
             var steps = line.Split(' ').ToList();
 
+            var repeatName = _repeatedTableName == steps[1];
+            _repeatedTableName = _repeatedTableName == steps[1] ? _repeatedTableName : steps[1];
+
             Set(Color.Cyan);
             switch (steps[0].ToLower())
             {
@@ -54,7 +58,7 @@ namespace Surly.Helpers
                     break;
 
                 case "insert":
-                    Console.WriteLine("Adding tuple to " + steps[1]);
+                    if (!repeatName) Console.WriteLine("\nAdding tuple(s) to " + steps[1]);
                     Set(Color.Cyan);
 
                     AddTuples(steps[1], line);
@@ -120,17 +124,22 @@ namespace Surly.Helpers
             var table = Database.Tables.Single(x => x.Name == tableName);
             var schema = table.Schema;
 
-            Set(Color.Blue);
-            Console.Write("Parsed: ");
-            tuples.ToList().ForEach(x => Console.Write($"{x} "));
-            Console.WriteLine();
+            WriteRow(tuples.ToList(), "\tParsed: ", Color.Blue);
+            var newTuple = new LinkedList<SurlyAttribute>();
 
-            var test = schema.Zip(tuples, (schemaItem, tuple) =>
+            for (var i = 0; i < schema.Count; i++)
             {
-                Console.WriteLine($"Trying to save {tuple} in {schemaItem.Name} as {schemaItem.Type}, which has a max of {schemaItem.Maximum}.");
-                var item = new SurlyAttribute { Value = tuple };
-                return item;
-            });
+                newTuple.AddLast(new SurlyAttribute { Value = tuples[i] });
+            }
+
+            if (newTuple.Count > 0) table.Tuples.AddLast(newTuple);
+
+            //var test = schema.Zip(tuples, (schemaItem, tuple) =>
+            //{
+            //    Console.WriteLine($"Trying to save {tuple} in {schemaItem.Name} as {schemaItem.Type}, which has a max of {schemaItem.Maximum}.");
+            //    var item = new SurlyAttribute { Value = tuple };
+            //    return item;
+            //});
 
             //table.Tuples = SurlyZip(schema, tuples);    //May not be necessary to create a recursive aggregator.
         }
