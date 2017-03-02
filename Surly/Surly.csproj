@@ -52,7 +52,7 @@
     <Compile Include="Core\SurlyDatabase.cs" />
     <Compile Include="Core\SurlyAttribute.cs" />
     <Compile Include="Core\SurlyAttributeSchema.cs" />
-    <Compile Include="Helpers\SurlyFileReader.cs" />
+    <Compile Include="Core\SurlyFileReader.cs" />
     <Compile Include="Core\SurlyTable.cs" />
     <Compile Include="Core\SurlyTuple.cs" />
   </ItemGroup>

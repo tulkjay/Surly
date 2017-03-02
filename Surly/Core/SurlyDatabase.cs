@@ -47,7 +47,6 @@ namespace Surly.Core
         public void PrintAll()
         {
             const string id = "Id";
-            WriteLine("\n***FULL DATABASE***");
 
             foreach (var table in Tables)
             {
