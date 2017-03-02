@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Core
 {
@@ -22,21 +24,34 @@ namespace Surly.Core
         public void PrintCatalog()
         {
             Console.WriteLine("\nPrinting tables");
+
             foreach (var table in Tables)
             {
-                Console.WriteLine($"\nTable: {table.Name}");
+                WriteLine($"\n\tTable: {table.Name}");
+
+                Console.WriteLine();
+
+                const string id = "Id";
+
+                Console.Write(id.PadRight(5));
 
                 foreach (var tuple in table.Schema)
                 {
-                    Console.Write($"\t{tuple.Name}");
+                    Console.Write($"{tuple.Name.PadRight(12)}");
                 }
+                var count = 1;
 
+                WriteLine("\n" + string.Empty.PadRight(100, '='), Color.Green);
+
+                Set(Color.Yellow);
                 foreach (var tableTuple in table.Tuples)
                 {
+                    Console.Write($"\n{count.ToString().PadRight(5)}");
                     foreach (var attribute in tableTuple)
                     {
-                        Console.WriteLine($"val: {attribute.Value}");
+                        Console.Write($"{attribute.Value.ToString().PadRight(12)}");
                     }
+                    count++;
                 }
                 Console.WriteLine();
             }

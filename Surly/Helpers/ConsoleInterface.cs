@@ -62,6 +62,13 @@ namespace Surly.Helpers
             Set(Color.Cyan);
         }
 
+        public static void WriteLine(string text, Color textColor = Color.Magenta, Color postTextColor = Color.Cyan)
+        {
+            Set(textColor);
+            Console.WriteLine(text);
+            Set(postTextColor);
+        }
+
         public static void WriteRow(List<string> dataList, string startString, Color textColor = Color.Magenta, Color postTextColor = Color.Cyan)
         {
             Set(textColor);

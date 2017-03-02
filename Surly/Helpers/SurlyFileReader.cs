@@ -117,7 +117,6 @@ namespace Surly.Helpers
             Console.WriteLine();
         }
 
-        //TODO - Get this data saved in the table
         private void AddTuples(string tableName, string line)
         {
             var tuples = string.Format(new SurlyFormatter(), "{0:insert}", line).SplitValues();
