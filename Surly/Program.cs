@@ -18,6 +18,8 @@ namespace Surly
 
             reader.ParseFile(Constants.SurlyInputFile);
 
+            Database.PrintAll();
+
             if (Debugger.IsAttached)
                 Console.ReadLine();
         }

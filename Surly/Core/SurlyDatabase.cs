@@ -21,8 +21,33 @@ namespace Surly.Core
 
         public void PrintCatalog()
         {
+            const string idHeader = "Id";
+            const string nameHeader = "Name";
+            const string typeHeader = "Type";
+            const string maxHeader = "Maximum";
+
+            WriteLine("\n\n\t*** CURRENT CATALOG ***");
+
+            foreach (var table in Tables)
+            {
+                var count = 1;
+                WriteLine($"\n\tTable: {table.Name}", Color.Blue);
+                Console.WriteLine();
+                WriteLine($"  {idHeader.PadRight(5)}{nameHeader.PadRight(20)}{typeHeader.PadRight(20)}{maxHeader}", Color.Yellow);
+                WriteLine($"{string.Empty.PadRight(100, '=')}");
+
+                foreach (var schema in table.Schema)
+                {
+                    WriteLine($"  {count.ToString().PadRight(5)}{schema.Name.PadRight(20)}{schema.Type.Name.PadRight(20)}{schema.Maximum}", Color.Green);
+                    count++;
+                }
+            }
+        }
+
+        public void PrintAll()
+        {
             const string id = "Id";
-            Console.WriteLine("\nPrinting tables");
+            WriteLine("\n***FULL DATABASE***");
 
             foreach (var table in Tables)
             {
@@ -31,9 +56,9 @@ namespace Surly.Core
 
                 Console.Write($"  {id.PadRight(8)}");
 
-                foreach (var tuple in table.Schema)
+                foreach (var schema in table.Schema)
                 {
-                    Console.Write($"{tuple.Name.PadRight(12)}");
+                    Console.Write($"{schema.Name.PadRight(12)}");
                 }
 
                 var count = 1;
