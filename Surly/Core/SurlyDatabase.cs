@@ -182,20 +182,34 @@ namespace Surly.Core
         {
             Set(Yellow);
 
+            if (Tables.Any(x => x.Name == tableName))
+            {
+                WriteLine($"Table {tableName} already exists. Please select a different table name.", Red);
+                return;
+            }
+
             Tables.AddLast(new SurlyTable(tableName));
 
-            var tuples = line
-                .Substring(line.IndexOf("(", StringComparison.Ordinal) + 1,
-                    line.IndexOf(")", StringComparison.Ordinal) - line.IndexOf("(", StringComparison.Ordinal) - 1);
-
-            var test = tuples.Split(',');
+            var tuples = string.Empty;
+            try
+            {
+                tuples = line
+                    .Substring(line.IndexOf("(", StringComparison.Ordinal) + 1,
+                        line.IndexOf(")", StringComparison.Ordinal) - line.IndexOf("(", StringComparison.Ordinal) - 1);
+            }
+            catch (Exception)
+            {
+                WriteLine("Syntax error", Red);
+            }
 
             Set(Green);
 
-            foreach (var tuple in test)
+            foreach (var tuple in tuples.Split(','))
             {
                 var parts = tuple.Trim().Split(' ');
                 int numMax;
+
+                if (!ValidTuple(tableName, parts)) return;
 
                 Tables.Last.Value.Schema.AddLast(new SurlyAttributeSchema
                 {
@@ -206,6 +220,34 @@ namespace Surly.Core
             }
 
             Console.WriteLine();
+        }
+
+        private bool ValidTuple(string tableName, string[] parts)
+        {
+            if (parts.Any(string.IsNullOrWhiteSpace))
+            {
+                WriteLine("Invalid syntax in schema definition", Red);
+                return false;
+            }
+
+            if (Tables
+                .Single(x => x.Name == tableName).Schema
+                .Any(x => x.Name == parts[0]))
+            {
+                WriteLine($"{parts[0]} already exists. Please select a different attribute name.");
+                return false;
+            }
+
+            try
+            {
+                var testType = parts[1].ToSurlyType();
+            }
+            catch (Exception)
+            {
+                WriteLine($"{parts[1]} is not a recognized type.");
+                return false;
+            }
+            return true;
         }
 
         private void AddTuples(string tableName, string line)

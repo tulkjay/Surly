@@ -48,11 +48,10 @@ namespace Surly.Helpers
             {
                 var substringBegin = text.IndexOf("'", StringComparison.Ordinal);
                 var substringEnd = text.IndexOf("'", substringBegin + 1, StringComparison.Ordinal);
+
                 var temp = text.Substring(0, substringBegin);
 
-                var testLength = substringEnd - substringBegin;
-
-                var quotedString = text.Substring(substringBegin, testLength + 1);
+                var quotedString = text.Substring(substringBegin, substringEnd - substringBegin + 1);
 
                 text = text.Replace(quotedString, "");
 

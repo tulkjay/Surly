@@ -7,7 +7,6 @@ using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Core
 {
-    //TODO - Pull out functions that should be defined in the database definition.
     public class SurlyFileReader
     {
         public SurlyDatabase Database = SurlyDatabase.GetInstance();
