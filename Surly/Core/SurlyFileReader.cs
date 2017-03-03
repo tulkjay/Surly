@@ -39,6 +39,19 @@ namespace Surly.Core
             Database.ExecuteQuery(line);
         }
 
+        public static void LoadFile()
+        {
+            var reader = new SurlyFileReader();
+
+            Console.Write("Enter the path to the file or press enter for default.(default): ");
+            var path = Console.ReadLine();
+
+            if (String.IsNullOrWhiteSpace(path) || path == "default")
+                path = Constants.SurlyInputFile;
+
+            reader.ParseFile(path);
+        }
+
         //It may not be necessary to create a recursive aggregator.
         public static LinkedList<LinkedList<SurlyTuple>> SurlyZip(LinkedList<SurlyAttributeSchema> schema, params object[] items)
         {

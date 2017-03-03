@@ -30,6 +30,7 @@ namespace Surly.Core
             const string maxHeader = "Maximum";
 
             WriteLine("\n\n\t*** CURRENT CATALOG ***\n");
+
             if (Tables.Count == 0) WriteLine("\t<--EMPTY-->\n\n", Red);
 
             foreach (var table in Tables)
@@ -51,11 +52,12 @@ namespace Surly.Core
             }
         }
 
-        public void PrintAll()
+        public void PrintDatabase()
         {
             const string id = "Id";
 
             WriteLine("\n\n\t*** FULL DATABASE ***\n");
+
             if (Tables.Count == 0) WriteLine("\t<--EMPTY-->\n\n", Red);
 
             foreach (var table in Tables)
@@ -201,6 +203,7 @@ namespace Surly.Core
             }
 
             Set(Green);
+            var tableCreated = false;
 
             foreach (var tuple in tuples.Split(','))
             {
@@ -209,7 +212,11 @@ namespace Surly.Core
 
                 if (!ValidTuple(tableName, parts)) return;
 
-                Tables.AddLast(new SurlyTable(tableName));
+                if (!tableCreated)
+                {
+                    Tables.AddLast(new SurlyTable(tableName));
+                    tableCreated = true;
+                }
 
                 Tables.Last.Value.Schema.AddLast(new SurlyAttributeSchema
                 {

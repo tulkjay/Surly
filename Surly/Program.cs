@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Net;
-using System.Runtime.Remoting.Messaging;
 using Surly.Core;
-using Surly.Helpers;
-using static System.ConsoleColor;
 using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly
@@ -19,8 +15,6 @@ namespace Surly
 
             StartApplication();
 
-            Database.PrintAll();
-
             if (Debugger.IsAttached)
                 Console.ReadLine();
         }
@@ -30,17 +24,9 @@ namespace Surly
             var repeat = true;
             while (repeat)
             {
-                ConsoleInterface.PrintMenu();
-                repeat = ConsoleInterface.HandleSelection(Console.ReadLine());
+                PrintMenu();
+                repeat = HandleSelection(Console.ReadLine());
             }
         }
-
-        /*
-        Help.
-            list commands
-        Exit.
-        execute action
-            new query
-        */
     }
 }

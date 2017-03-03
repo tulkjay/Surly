@@ -74,11 +74,11 @@ namespace Surly.Helpers
                     break;
 
                 case "3":
-                    LoadFile();
+                    SurlyFileReader.LoadFile();
                     break;
 
                 case "4":
-                    Database.PrintAll();
+                    Database.PrintDatabase();
                     break;
 
                 case "5":
@@ -89,7 +89,7 @@ namespace Surly.Helpers
                     return false;
 
                 default:
-                    Console.WriteLine($"\n{input} is not an option. Please try again.\n");
+                    Console.WriteLine($"\n{input} is not an option. Please enter a valid selection.");
                     return true;
             }
             return true;
@@ -133,19 +133,6 @@ namespace Surly.Helpers
             Console.Write("\nEnter a query: \n\t> ");
 
             Set(Cyan);
-        }
-
-        private static void LoadFile()
-        {
-            var reader = new SurlyFileReader();
-
-            Console.Write("Enter the path to the file or press enter for default.(default): ");
-            var path = Console.ReadLine();
-
-            if (string.IsNullOrWhiteSpace(path) || path == "default")
-                path = Constants.SurlyInputFile;
-
-            reader.ParseFile(path);
         }
 
         private static void PrintHelp()
