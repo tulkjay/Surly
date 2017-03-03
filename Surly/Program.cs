@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
+using System.Runtime.Remoting.Messaging;
 using Surly.Core;
 using Surly.Helpers;
+using static System.ConsoleColor;
 using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly
@@ -14,14 +17,30 @@ namespace Surly
         {
             WelcomeOurGuests();
 
-            var reader = new SurlyFileReader();
-
-            reader.ParseFile(Constants.SurlyInputFile);
+            StartApplication();
 
             Database.PrintAll();
 
             if (Debugger.IsAttached)
                 Console.ReadLine();
         }
+
+        private static void StartApplication()
+        {
+            var repeat = true;
+            while (repeat)
+            {
+                ConsoleInterface.PrintMenu();
+                repeat = ConsoleInterface.HandleSelection(Console.ReadLine());
+            }
+        }
+
+        /*
+        Help.
+            list commands
+        Exit.
+        execute action
+            new query
+        */
     }
 }

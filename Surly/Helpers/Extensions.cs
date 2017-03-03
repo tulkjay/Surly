@@ -16,8 +16,10 @@ namespace Surly.Helpers
 
                 case "num":
                     return typeof(int);
+
+                default:
+                    return null;
             }
-            return null;
         }
 
         public static string[] SplitValues(this string text, char delimiter = ' ')
@@ -75,17 +77,16 @@ namespace Surly.Helpers
         public static dynamic To<T>(this T source, Type destination, int max)
         {
             if (destination == typeof(string))
-            {
-                if (source.ToString().Length > max) return SizeError(source, max);
-                var test = Convert.ChangeType(source, destination);
-                return test;
-            }
+                return source.ToString().Length > max
+                    ? SizeError(source, max)
+                    : Convert.ChangeType(source, destination);
+
             return source;
         }
 
         private static object SizeError(object source, int max)
         {
-            WriteLine($"Error: {source} length was {source.ToString().Length}, maximum allowed is {max}. Trimming...", Color.Red);
+            WriteLine($"Truncation warning: {source} length was {source.ToString().Length}, maximum allowed is {max}. Truncating...", ConsoleColor.Red);
             return source.ToString().Substring(0, max);
         }
     }
