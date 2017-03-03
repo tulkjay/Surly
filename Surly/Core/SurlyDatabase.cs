@@ -101,7 +101,7 @@ namespace Surly.Core
 
                     Set(Cyan);
 
-                    CreateTable(steps[1], line);
+                    CreateTable(steps[1].ToUpper(), line);
 
                     Set(Magenta);
                     break;
@@ -111,7 +111,7 @@ namespace Surly.Core
 
                     Set(Cyan);
 
-                    AddTuples(steps[1], line);
+                    AddTuples(steps[1].ToUpper(), line);
 
                     Set(Magenta);
                     break;
@@ -142,7 +142,7 @@ namespace Surly.Core
 
             var tables = steps
                 .Select(step => Tables
-                    .SingleOrDefault(x => x.Name == step))
+                    .SingleOrDefault(x => x.Name == step.ToUpper()))
                 .ToList();
 
             foreach (var table in tables)
@@ -188,8 +188,6 @@ namespace Surly.Core
                 return;
             }
 
-            Tables.AddLast(new SurlyTable(tableName));
-
             var tuples = string.Empty;
             try
             {
@@ -211,6 +209,8 @@ namespace Surly.Core
 
                 if (!ValidTuple(tableName, parts)) return;
 
+                Tables.AddLast(new SurlyTable(tableName));
+
                 Tables.Last.Value.Schema.AddLast(new SurlyAttributeSchema
                 {
                     Name = parts[0],
@@ -230,21 +230,27 @@ namespace Surly.Core
                 return false;
             }
 
-            if (Tables
-                .Single(x => x.Name == tableName).Schema
-                .Any(x => x.Name == parts[0]))
+            var table = Tables
+                .SingleOrDefault(x => x.Name == tableName);
+
+            if (table != null && table.Schema
+                    .Any(x => x.Name == parts?[0]))
             {
-                WriteLine($"{parts[0]} already exists. Please select a different attribute name.");
+                WriteLine($"{parts[0]} already exists. Please select a different attribute name.", Red);
                 return false;
             }
 
             try
             {
-                var testType = parts[1].ToSurlyType();
+                if (parts[1].ToSurlyType() == null)
+                {
+                    WriteLine($"{parts[1]} is not a recognized type.", Red);
+                    return false;
+                }
             }
             catch (Exception)
             {
-                WriteLine($"{parts[1]} is not a recognized type.");
+                WriteLine($"{parts[1]} is not a recognized type.", Red);
                 return false;
             }
             return true;
@@ -252,6 +258,12 @@ namespace Surly.Core
 
         private void AddTuples(string tableName, string line)
         {
+            if (Tables.All(x => x.Name != tableName))
+            {
+                WriteLine($"Table {tableName} was not found.", Red);
+                return;
+            }
+
             var tuples = string.Format(new SurlyFormatter(), "{0:insert}", line).SplitValues();
             var table = Tables.Single(x => x.Name == tableName);
             var schema = table.Schema.ToArray();
