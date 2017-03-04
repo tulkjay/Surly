@@ -36,17 +36,19 @@ namespace Surly.Core
             foreach (var table in Tables)
             {
                 var count = 1;
+
                 WriteLine($"\n\tTable: {table.Name}", Blue);
+
                 Console.WriteLine();
-                WriteLine($"  {idHeader.PadRight(5)}{nameHeader.PadRight(20)}{typeHeader.PadRight(20)}{maxHeader}",
-                    Yellow);
+
+                WriteLine($"  {idHeader.PadRight(5)}{nameHeader.PadRight(20)}{typeHeader.PadRight(20)}{maxHeader}", Yellow);
+
                 WriteLine($"{string.Empty.PadRight(100, '=')}");
 
                 foreach (var schema in table.Schema)
                 {
                     WriteLine(
-                        $"  {count.ToString().PadRight(5)}{schema.Name.PadRight(20)}{schema.Type.Name.PadRight(20)}{schema.Maximum}",
-                        Green);
+                        $"  {count.ToString().PadRight(5)}{schema.Name.PadRight(20)}{schema.Type.Name.PadRight(20)}{schema.Maximum}", Green);
                     count++;
                 }
             }
@@ -62,13 +64,19 @@ namespace Surly.Core
 
             foreach (var table in Tables)
             {
-                WriteLine($"\n\tTable: {table.Name}");
-                Console.WriteLine();
+                WriteLine($"\n\tTable: {table.Name}\n");
 
                 Console.Write($"  {id.PadRight(8)}");
 
+                var widthReferences = new List<int>();
+
                 foreach (var schema in table.Schema)
-                    Console.Write($"{schema.Name.PadRight(12)}");
+                {
+                    var tableWidth = Math.Max(schema.Maximum + 2, schema.Name.Length + 2);
+
+                    Console.Write($"{schema.Name.PadRight(tableWidth)}");
+                    widthReferences.Add(tableWidth);
+                }
 
                 var count = 1;
 
@@ -78,10 +86,14 @@ namespace Surly.Core
 
                 foreach (var tableTuple in table.Tuples)
                 {
+                    var index = 0;
                     Console.Write($"  {count.ToString().PadRight(8)}");
 
                     foreach (var attribute in tableTuple)
-                        Console.Write($"{attribute.Value.ToString().PadRight(12)}");
+                    {
+                        Console.Write($"{attribute.Value.ToString().PadRight(widthReferences[index])}");
+                        index++;
+                    }
 
                     Console.WriteLine();
 
@@ -96,29 +108,20 @@ namespace Surly.Core
             var steps = line.Split(' ').ToList();
 
             Set(Cyan);
-            switch (steps[0].ToLower())
+            switch (steps[0].ToUpper())
             {
-                case "relation":
-                    Console.WriteLine("Creating table: " + steps[1] + "\n");
-
-                    Set(Cyan);
-
+                case "RELATION":
+                    WriteLine($"Creating table: {steps[1]}", Cyan);
                     CreateTable(steps[1].ToUpper(), line);
-
-                    Set(Magenta);
                     break;
 
-                case "insert":
-                    Console.WriteLine("\nAdding tuple(s) to " + steps[1]);
-
-                    Set(Cyan);
-
-                    AddTuples(steps[1].ToUpper(), line);
-
-                    Set(Magenta);
+                case "INSERT":
+                    var rowAdded = AddTuples(steps[1].ToUpper(), line);
+                    if (rowAdded)
+                        WriteLine($"Row added to {steps[1].ToUpper()}", Green);
                     break;
 
-                case "print":
+                case "PRINT":
                     Set(Cyan);
 
                     Print(line.Replace(",", "").Split(' ').ToList());
@@ -127,11 +130,7 @@ namespace Surly.Core
                     break;
 
                 default:
-                    Set(Red);
-
-                    Console.WriteLine("Not sure about this command: " + steps[0]);
-
-                    Set(Cyan);
+                    WriteLine($"Not sure about this command: {steps[0].ToUpper()}", Red);
                     break;
             }
         }
@@ -263,26 +262,30 @@ namespace Surly.Core
             return true;
         }
 
-        private void AddTuples(string tableName, string line)
+        private bool AddTuples(string tableName, string line)
         {
+            var rowsAdded = false;
             if (Tables.All(x => x.Name != tableName))
             {
                 WriteLine($"Table {tableName} was not found.", Red);
-                return;
+                return false;
             }
 
             var tuples = string.Format(new SurlyFormatter(), "{0:insert}", line).SplitValues();
             var table = Tables.Single(x => x.Name == tableName);
             var schema = table.Schema.ToArray();
 
-            WriteRow(tuples.ToList(), "\tParsed: ", Blue);
-
             var newTuple = new LinkedList<SurlyAttribute>();
 
             for (var i = 0; i < schema.Length; i++)
                 newTuple.AddLast(new SurlyAttribute { Value = tuples[i].To(schema[i].Type, schema[i].Maximum) });
 
-            if (newTuple.Count > 0) table.Tuples.AddLast(newTuple);
+            if (newTuple.Count > 0)
+            {
+                table.Tuples.AddLast(newTuple);
+                rowsAdded = true;
+            }
+            return rowsAdded;
         }
     }
 }

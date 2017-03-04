@@ -17,7 +17,7 @@ namespace Surly.Helpers
         public static void WelcomeOurGuests()
         {
             Set(Magenta);
-            Console.WriteLine("\t\tWelcome, welcome! \n\n" +
+            MakeEpic("\n\t\tWelcome, welcome! \n\n" +
                               "\t\tYou are thusly a guest to the surliest database under the sun! Begin..." +
                               "\n\n");
             Set(Cyan);
@@ -45,21 +45,25 @@ namespace Surly.Helpers
 
         public static void PrintMenu()
         {
-            Set(Cyan);
-            Console.WriteLine("\n\tMain Menu");
-            Set(Yellow);
-            Console.WriteLine(string.Empty.PadRight(35, '='));
-            Set(Cyan);
+            WriteLine("\n\tMain Menu");
+            WriteLine(string.Empty.PadRight(35, '='), Yellow);
+
             Console.WriteLine("\t1. New Query");
             Console.WriteLine("\t2. Print Catalog");
             Console.WriteLine("\t3. Execute Script File");
             Console.WriteLine("\t4. Print Full Database");
             Console.WriteLine("\t5. Help");
             Console.WriteLine("\t6. Exit");
+
             Set(Blue);
             Console.Write("\nPlease make a selection: ");
             Set(Magenta);
         }
+
+        public static List<ConsoleColor> ConsoleColors = new List<ConsoleColor>
+        {
+            Red, Cyan, DarkCyan, DarkGreen, DarkMagenta, DarkRed, DarkYellow, Gray, Green, Magenta, Yellow, DarkYellow, White
+        };
 
         public static bool HandleSelection(string input)
         {
@@ -86,6 +90,7 @@ namespace Surly.Helpers
                     break;
 
                 case "6":
+                    MakeEpic("\n\tCome again soon!");
                     return false;
 
                 default:
@@ -93,6 +98,23 @@ namespace Surly.Helpers
                     return true;
             }
             return true;
+        }
+
+        public static void MakeEpic(string message)
+        {
+            var messageArray = message.ToCharArray();
+
+            var rand = new Random();
+
+            foreach (var c in messageArray)
+            {
+                var colorIndex = rand.Next() % ConsoleColors.Count;
+                Console.ForegroundColor = ConsoleColors[colorIndex];
+                Console.Write(c);
+            }
+
+            Set(Cyan);
+            Console.WriteLine();
         }
 
         private static void NewQueryHandler()
@@ -144,13 +166,16 @@ namespace Surly.Helpers
                 "PRINT <table-name>, ... ;"
             };
 
-            WriteLine("\nCurrently available query request actions are: \n", Yellow);
+            WriteLine("\n" + string.Empty.PadRight(110, '='), Green);
+            WriteLine("Currently available query request actions are: \n", Yellow);
+
             foreach (var action in actions)
             {
                 Console.WriteLine($"\t{action}\n");
             }
-            Set(Yellow);
-            Console.WriteLine("\nTo execute scripts from a file, you can either use the default Surly file or import one.\n");
+
+            WriteLine("\nTo execute scripts from a file, you can either use the default Surly file or enter the file path name.", Yellow);
+            WriteLine(string.Empty.PadRight(110, '='), Green);
         }
 
         private static void NewQuery(string query)

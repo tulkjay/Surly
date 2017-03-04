@@ -16,7 +16,10 @@ namespace Surly
             StartApplication();
 
             if (Debugger.IsAttached)
+            {
+                Console.Write("\nPress Enter to close the window... ");
                 Console.ReadLine();
+            }
         }
 
         private static void StartApplication()
