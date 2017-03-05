@@ -117,6 +117,7 @@ namespace Surly.Core
 
                 case "INSERT":
                     var rowAdded = AddTuples(steps[1].ToUpper(), line);
+
                     if (rowAdded)
                         WriteLine($"Row added to {steps[1].ToUpper()}", Green);
                     break;
@@ -155,8 +156,15 @@ namespace Surly.Core
 
                 Console.Write($"  {id.PadRight(8)}");
 
+                var widthReferences = new List<int>();
+
                 foreach (var schema in table.Schema)
-                    Console.Write($"{schema.Name.PadRight(12)}");
+                {
+                    var tableWidth = Math.Max(schema.Maximum + 2, schema.Name.Length + 2);
+
+                    Console.Write($"{schema.Name.PadRight(tableWidth)}");
+                    widthReferences.Add(tableWidth);
+                }
 
                 var count = 1;
 
@@ -166,10 +174,14 @@ namespace Surly.Core
 
                 foreach (var tableTuple in table.Tuples)
                 {
+                    var index = 0;
                     Console.Write($"  {count.ToString().PadRight(8)}");
 
                     foreach (var attribute in tableTuple)
-                        Console.Write($"{attribute.Value.ToString().PadRight(12)}");
+                    {
+                        Console.Write($"{attribute.Value.ToString().PadRight(widthReferences[index])}");
+                        index++;
+                    }
 
                     Console.WriteLine();
 

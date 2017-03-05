@@ -77,13 +77,35 @@ namespace Surly.Helpers
         {
             if (destination == typeof(string))
                 return source.ToString().Length > max
-                    ? SizeError(source, max)
+                    ? StringLengthError(source, max)
+                    : Convert.ChangeType(source, destination);
+
+            if (destination == typeof(int))
+                return int.Parse(source.ToString()) > max
+                    ? IntMaximumError(source, max)
                     : Convert.ChangeType(source, destination);
 
             return source;
         }
 
-        private static object SizeError(object source, int max)
+        private static object IntMaximumError(object source, int max)
+        {
+            int value;
+            var valid = int.TryParse(source.ToString(), out value);
+
+            if (valid)
+            {
+                if (!(value > Math.Pow(10, max))) return value;
+
+                WriteLine($"Truncation warning: Value was {source}, maximum allowed is {max}. Truncating...", ConsoleColor.Red);
+                return Math.Pow(10, max) - 1;
+            }
+
+            WriteLine($"{source} is not a valid NUM value.");
+            return null;
+        }
+
+        private static object StringLengthError(object source, int max)
         {
             WriteLine($"Truncation warning: {source} length was {source.ToString().Length}, maximum allowed is {max}. Truncating...", ConsoleColor.Red);
             return source.ToString().Substring(0, max);
