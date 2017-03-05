@@ -130,6 +130,11 @@ namespace Surly.Core
                     Set(Magenta);
                     break;
 
+                case "DELETE":
+                    var TableDelted = DeleteTables(steps[1].ToUpper(), line);
+                    if (TableDelted)
+                        WriteLine($"Deleted Table Named {steps[1].ToUpper()}",Green);
+                    break;
                 default:
                     WriteLine($"Not sure about this command: {steps[0].ToUpper()}", Red);
                     break;
@@ -298,6 +303,33 @@ namespace Surly.Core
                 rowsAdded = true;
             }
             return rowsAdded;
+        }
+
+        private bool DeleteTables(string tableName, string line)
+        {
+            var DeleteSucess = false;
+            if (Tables.All(x => x.Name != tableName))
+            {
+                WriteLine($"Table {tableName} was not found.", Red);
+                return false;
+            }
+            var table = Tables.SingleOrDefault(x => x.Name == tableName);
+            DeleteSucess = Tables.Remove(table);
+            return DeleteSucess;
+
+        }
+
+        private bool DeleteTouple(string tableName, string line)
+        {
+            {
+                var rowsAdded = false;
+                if (Tables.All(x => x.Name != tableName))
+                {
+                    WriteLine($"Table {tableName} was not found.", Red);
+                    return false;
+                }
+                return rowsAdded;
+            }
         }
     }
 }
