@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Surly.Core
+namespace Surly.Core.Structure
 {
     public class SurlyAttributeSchema
     {

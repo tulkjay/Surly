@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using Surly.Core;
+using Surly.Core.Structure;
 using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly

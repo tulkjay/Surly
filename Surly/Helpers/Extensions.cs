@@ -1,10 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Surly.Core.Structure;
 using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Helpers
 {
+    public static class SurlyExtensions
+    {
+        public static bool ValidTuple(this SurlyDatabase database, string tableName, string[] parts)
+        {
+            if (parts.Any(string.IsNullOrWhiteSpace))
+            {
+                WriteLine("Invalid syntax in schema definition", ConsoleColor.Red);
+                return false;
+            }
+
+            var table = database.Tables.SingleOrDefault(x => x.Name == tableName);
+
+            if (table != null && table.Schema
+                    .Any(x => x.Name == parts?[0]))
+            {
+                WriteLine($"{parts[0]} already exists. Please select a different attribute name.", ConsoleColor.Red);
+                return false;
+            }
+
+            try
+            {
+                if (parts[1].ToSurlyType() == null)
+                {
+                    WriteLine($"{parts[1]} is not a recognized type.", ConsoleColor.Red);
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                WriteLine($"{parts[1]} is not a recognized type.", ConsoleColor.Red);
+                return false;
+            }
+            return true;
+        }
+    }
+
     public static class Extensions
     {
         public static Type ToSurlyType(this string typeName)
@@ -97,7 +134,8 @@ namespace Surly.Helpers
             {
                 if (!(value > Math.Pow(10, max))) return value;
 
-                WriteLine($"Truncation warning: Value was {source}, maximum allowed is {max}. Truncating...", ConsoleColor.Red);
+                WriteLine($"Truncation warning: Value was {source}, maximum allowed is {max}. Truncating...",
+                    ConsoleColor.Red);
                 return Math.Pow(10, max) - 1;
             }
 
@@ -107,7 +145,9 @@ namespace Surly.Helpers
 
         private static object StringLengthError(object source, int max)
         {
-            WriteLine($"Truncation warning: {source} length was {source.ToString().Length}, maximum allowed is {max}. Truncating...", ConsoleColor.Red);
+            WriteLine(
+                $"Truncation warning: {source} length was {source.ToString().Length}, maximum allowed is {max}. Truncating...",
+                ConsoleColor.Red);
             return source.ToString().Substring(0, max);
         }
     }

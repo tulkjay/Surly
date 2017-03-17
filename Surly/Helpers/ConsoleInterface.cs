@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Surly.Core;
+using Surly.Core.Functions;
+using Surly.Core.Structure;
 using static System.ConsoleColor;
 
 namespace Surly.Helpers
@@ -8,6 +9,23 @@ namespace Surly.Helpers
     public static class ConsoleInterface
     {
         private static readonly SurlyDatabase Database = SurlyDatabase.GetInstance();
+
+        public static List<ConsoleColor> ConsoleColors = new List<ConsoleColor>
+        {
+            Red,
+            Cyan,
+            DarkCyan,
+            DarkGreen,
+            DarkMagenta,
+            DarkRed,
+            DarkYellow,
+            Gray,
+            Green,
+            Magenta,
+            Yellow,
+            DarkYellow,
+            White
+        };
 
         public static void Set(ConsoleColor selection)
         {
@@ -18,8 +36,8 @@ namespace Surly.Helpers
         {
             Set(Magenta);
             MakeEpic("\n\t\tWelcome, welcome! \n\n" +
-                              "\t\tYou are thusly a guest to the surliest database under the sun! Begin..." +
-                              "\n\n");
+                     "\t\tYou are thusly a guest to the surliest database under the sun! Begin..." +
+                     "\n\n");
             Set(Cyan);
         }
 
@@ -30,7 +48,8 @@ namespace Surly.Helpers
             Set(postTextColor);
         }
 
-        public static void WriteRow(List<string> dataList, string startString, ConsoleColor textColor = Magenta, ConsoleColor postTextColor = Cyan)
+        public static void WriteRow(List<string> dataList, string startString, ConsoleColor textColor = Magenta,
+            ConsoleColor postTextColor = Cyan)
         {
             Set(textColor);
 
@@ -59,11 +78,6 @@ namespace Surly.Helpers
             Console.Write("\nPlease make a selection: ");
             Set(Magenta);
         }
-
-        public static List<ConsoleColor> ConsoleColors = new List<ConsoleColor>
-        {
-            Red, Cyan, DarkCyan, DarkGreen, DarkMagenta, DarkRed, DarkYellow, Gray, Green, Magenta, Yellow, DarkYellow, White
-        };
 
         public static bool HandleSelection(string input)
         {
@@ -170,11 +184,11 @@ namespace Surly.Helpers
             WriteLine("Currently available query request actions are: \n", Yellow);
 
             foreach (var action in actions)
-            {
                 Console.WriteLine($"\t{action}\n");
-            }
 
-            WriteLine("\nTo execute scripts from a file, you can either use the default Surly file or enter the file path name.", Yellow);
+            WriteLine(
+                "\nTo execute scripts from a file, you can either use the default Surly file or enter the file path name.",
+                Yellow);
             WriteLine(string.Empty.PadRight(110, '='), Green);
         }
 

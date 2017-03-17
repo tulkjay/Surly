@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Surly.Core
+namespace Surly.Core.Structure
 {
     public class SurlyTuple
     {

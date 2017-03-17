@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using static System.ConsoleColor;
-using static Surly.Helpers.ConsoleInterface;
+using Surly.Core;
+using Surly.Core.Functions;
+using Surly.Core.Structure;
 
-namespace Surly.Core
+namespace Surly.Helpers
 {
     public class SurlyFileReader
     {
@@ -18,18 +19,16 @@ namespace Surly.Core
                 using (var reader = new StreamReader(filePath))
                 {
                     while (!reader.EndOfStream)
-                    {
                         ParseLine(reader.ReadLine());
-                    }
                 }
             }
             catch (Exception ex)
             {
-                Set(Red);
+                ConsoleInterface.Set(ConsoleColor.Red);
 
                 Console.WriteLine($"Error: {ex.Message}");
 
-                Set(Cyan);
+                ConsoleInterface.Set(ConsoleColor.Cyan);
             }
         }
 
@@ -46,24 +45,25 @@ namespace Surly.Core
             Console.Write("Enter the path to the file or press enter for default.(default): ");
             var path = Console.ReadLine();
 
-            if (String.IsNullOrWhiteSpace(path) || path == "default")
+            if (string.IsNullOrWhiteSpace(path) || path == "default")
                 path = Constants.SurlyInputFile;
 
             reader.ParseFile(path);
         }
 
         //It may not be necessary to create a recursive aggregator.
-        public static LinkedList<LinkedList<SurlyTuple>> SurlyZip(LinkedList<SurlyAttributeSchema> schema, params object[] items)
+        public static LinkedList<LinkedList<SurlyTuple>> SurlyZip(LinkedList<SurlyAttributeSchema> schema,
+            params object[] items)
         {
-            Set(Yellow);
+            ConsoleInterface.Set(ConsoleColor.Yellow);
 
             var test = schema.ToArray().Zip(items.ToArray(), (schemaItem, item) =>
             {
                 Console.WriteLine($"Pretending {item} is {schemaItem.Type}.");
-                return new SurlyAttribute { Value = item };
+                return new SurlyAttribute {Value = item};
             });
 
-            Set(Cyan);
+            ConsoleInterface.Set(ConsoleColor.Cyan);
             return null;
         }
     }

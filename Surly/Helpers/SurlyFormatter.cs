@@ -5,8 +5,6 @@ namespace Surly.Helpers
 {
     public class SurlyFormatter : IFormatProvider, ICustomFormatter
     {
-        public object GetFormat(Type formatType) => formatType == typeof(ICustomFormatter) ? this : null;
-
         public string Format(string format, object arg, IFormatProvider formatProvider)
         {
             var text = arg.ToString();
@@ -21,5 +19,7 @@ namespace Surly.Helpers
 
             return text.Replace("&#39;", "'");
         }
+
+        public object GetFormat(Type formatType) => formatType == typeof(ICustomFormatter) ? this : null;
     }
 }

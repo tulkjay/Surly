@@ -1,4 +1,4 @@
-﻿namespace Surly.Core
+﻿namespace Surly.Core.Structure
 {
     public class SurlyAttribute<T>
     {
