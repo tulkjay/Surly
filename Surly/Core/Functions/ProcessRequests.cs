@@ -13,6 +13,7 @@ namespace Surly.Core.Functions
             if (line.Contains("="))
             {
                 database.Project(line);
+                return;
             }
 
             var steps = line.Split(' ').ToList();

@@ -15,7 +15,12 @@ namespace Surly.Core.Functions
 
             if (table != null) return table;
 
-            WriteLine($"\n\tTable {tableName.ToUpper()} not found.", Red);
+            var projection = SurlyProjections.GetInstance().Projections
+                .SingleOrDefault(x => x.ProjectionName == tableName.ToUpper());
+
+            if (projection != null) return projection.BuildProjection();
+            
+            WriteLine($"\n\t{tableName.ToUpper()} not found.", Red);
 
             return null;
         }
@@ -25,7 +30,7 @@ namespace Surly.Core.Functions
 
             query.RemoveAt(0);
 
-            var tables = query
+            var tables = query                
                 .Select(database.GetTable)
                 .ToList();                
 

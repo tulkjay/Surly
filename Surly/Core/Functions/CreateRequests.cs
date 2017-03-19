@@ -9,28 +9,6 @@ using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Core.Functions
 {
-    public static class ProjectRequests
-    {
-        public static void Project(this SurlyDatabase database, string query)
-        {
-            var projections = SurlyProjections.GetInstance();
-            
-            //Parse query
-            var projectionName = query;
-            
-            //Get projection name and verify tables exist
-            
-            
-            projections.Projections.AddLast(new SurlyProjection
-            {
-                ProjectionName = projectionName                
-            });
-                        
-            //Add Projection to projections
-            //Print results
-        }
-    }
-
     public static class CreateRequests
     {
         public static bool AddTuples(this SurlyDatabase database, string tableName, string line)
@@ -69,6 +47,7 @@ namespace Surly.Core.Functions
             }
 
             var tuples = string.Empty;
+
             try
             {
                 tuples = line.Substring(line.IndexOf("(", StringComparison.Ordinal) + 1,

@@ -43,6 +43,7 @@
     <Compile Include="Core\Functions\CreateRequests.cs" />
     <Compile Include="Core\Functions\PrintRequests.cs" />
     <Compile Include="Core\Functions\ProcessRequests.cs" />
+    <Compile Include="Core\Functions\ProjectRequests.cs" />
     <Compile Include="Core\Structure\SurlyAttribute.cs" />
     <Compile Include="Core\Structure\SurlyAttributeSchema.cs" />
     <Compile Include="Core\Structure\SurlyDatabase.cs" />
