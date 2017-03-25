@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Surly.Core.Structure;
+using static System.ConsoleColor;
 using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Helpers
@@ -12,7 +13,7 @@ namespace Surly.Helpers
         {
             if (parts.Any(string.IsNullOrWhiteSpace))
             {
-                WriteLine("Invalid syntax in schema definition", ConsoleColor.Red);
+                WriteLine("Invalid syntax in schema definition", Red);
                 return false;
             }
 
@@ -21,7 +22,7 @@ namespace Surly.Helpers
             if (table != null && table.Schema
                     .Any(x => x.Name == parts?[0]))
             {
-                WriteLine($"{parts[0]} already exists. Please select a different attribute name.", ConsoleColor.Red);
+                WriteLine($"{parts[0]} already exists. Please select a different attribute name.", Red);
                 return false;
             }
 
@@ -29,13 +30,19 @@ namespace Surly.Helpers
             {
                 if (parts[1].ToSurlyType() == null)
                 {
-                    WriteLine($"{parts[1]} is not a recognized type.", ConsoleColor.Red);
+                    WriteLine($"{parts[1]} is not a recognized type.", Red);
                     return false;
                 }
             }
             catch (Exception)
             {
-                WriteLine($"{parts[1]} is not a recognized type.", ConsoleColor.Red);
+                if (parts.Length < 2)
+                {
+                    WriteLine("Invalid syntax, please reference Help section for correct syntax", Red);
+                    return false;
+                }
+
+                WriteLine($"{parts[1]} is not a recognized type.", Red);
                 return false;
             }
             return true;
@@ -135,7 +142,7 @@ namespace Surly.Helpers
                 if (!(value > Math.Pow(10, max))) return value;
 
                 WriteLine($"Truncation warning: Value was {source}, maximum allowed is {max}. Truncating...",
-                    ConsoleColor.Red);
+                    Red);
                 return Math.Pow(10, max) - 1;
             }
 
@@ -147,7 +154,7 @@ namespace Surly.Helpers
         {
             WriteLine(
                 $"Truncation warning: {source} length was {source.ToString().Length}, maximum allowed is {max}. Truncating...",
-                ConsoleColor.Red);
+                Red);
             return source.ToString().Substring(0, max);
         }
     }

@@ -9,7 +9,7 @@ namespace Surly.Core.Functions
     {
         public static bool DeleteTable(this SurlyDatabase database, string tableName, string line)
         {
-            if (database.Tables.All(x => x.Name != tableName))
+            if(database.Tables.All(x => x.Name != tableName))
             {
                 WriteLine($"Table {tableName} was not found.", Red);
                 return false;

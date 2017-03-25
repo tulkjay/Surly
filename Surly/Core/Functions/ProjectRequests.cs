@@ -11,10 +11,72 @@ namespace Surly.Core.Functions
     public static class ProjectRequests
     {
         private static readonly SurlyProjections Projections = SurlyProjections.GetInstance();
-                        
-        public static SurlyTable BuildProjection(this SurlyProjection projection)
+        private static readonly SurlyDatabase Database = SurlyDatabase.GetInstance();                        
+        public static void PrintProjection(this SurlyProjection projection)
         {
-            return null;
+            const string id = "Id";
+
+            var table = Database.Tables.SingleOrDefault(x => x.Name == projection.TableName);
+
+            if (table == null)
+            {
+                WriteLine($"\n\t{projection.ProjectionName} is no longer a valid projection, {projection.TableName} no longer exists.", Red);
+                WriteLine($"\n\tRemoving {projection.ProjectionName}.", Green);
+
+                var staleProjection = Projections.Projections.Single(x => x.ProjectionName == projection.ProjectionName);
+
+                Projections.Projections.Remove(staleProjection);
+                return;
+            }            
+
+            WriteLine($"\n\tProjection: {projection.ProjectionName}\n");
+
+            Console.Write($"  {id.PadRight(8)}");
+
+            var widthReferences = new List<int>();
+
+            var place = 0;
+            var attributePlaces = new List<int>();
+            foreach (var schema in table.Schema)
+            {
+                if (!projection.AttributeNames.Contains(schema.Name))
+                {
+                    place++;
+                    continue;
+                }
+
+                var tableWidth = Math.Max(schema.Maximum + 2, schema.Name.Length + 2);                
+
+                Console.Write($"{schema.Name.PadRight(tableWidth)}");
+
+                widthReferences.Add(tableWidth);
+                attributePlaces.Add(place);
+                place++;
+            }
+
+            var count = 1;
+
+            WriteLine("\n" + string.Empty.PadRight(100, '='), Green);
+
+            Set(Yellow);
+
+            foreach (var tableTuple in table.Tuples)
+            {                
+                var index = 0;
+                Console.Write($"  {count.ToString().PadRight(8)}");
+                var tupleArray = tableTuple.ToArray();                 
+
+                foreach (var location in attributePlaces)
+                {                    
+                    Console.Write($"{tupleArray[location].Value.ToString().PadRight(widthReferences[index])}");
+                    index++;
+                }
+
+                Console.WriteLine();
+
+                count++;
+            }
+            Console.WriteLine();            
         }
 
         public static void Project(this SurlyDatabase database, string query)
@@ -42,12 +104,11 @@ namespace Surly.Core.Functions
                     .ToList();
 
                 var attributeNames = new LinkedList<string>();
+
                 foreach (var name in attributeNamesRegex)
                 {
                     attributeNames.AddLast(name.Trim());
                 }
-
-                attributeNamesRegex.ForEach(x => WriteLine($"\t{x}"));
 
                 var tableName = new Regex("(\\w+);", RegexOptions.IgnoreCase)
                     .Match(query)
@@ -72,7 +133,7 @@ namespace Surly.Core.Functions
                 //Add projection definition
                 Projections.Projections.AddLast(projection);
 
-                WriteLine($"\tNew projection added: {projectionName}", Green);
+                WriteLine($"\n\tNew projection added: {projectionName}", Green);
             }
             catch (Exception)
             {

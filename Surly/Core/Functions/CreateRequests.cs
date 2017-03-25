@@ -42,7 +42,7 @@ namespace Surly.Core.Functions
 
             if (database.Tables.Any(x => x.Name == tableName))
             {
-                WriteLine($"Table {tableName} already exists. Please select a different table name.", Red);
+                WriteLine($"\n\tTable {tableName} already exists. Please select a different table name.", Red);
                 return;
             }
 
@@ -55,7 +55,7 @@ namespace Surly.Core.Functions
             }
             catch (Exception)
             {
-                WriteLine("Syntax error", Red);
+                WriteLine("\n\tSyntax error", Red);
             }
 
             Set(Green);
@@ -72,6 +72,7 @@ namespace Surly.Core.Functions
                 {
                     database.Tables.AddLast(new SurlyTable(tableName));
                     tableCreated = true;
+                    WriteLine($"\n\tCreating table: {tableName}", Cyan);
                 }
 
                 database.Tables.Last.Value.Schema.AddLast(new SurlyAttributeSchema

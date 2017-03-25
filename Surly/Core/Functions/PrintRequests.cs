@@ -18,7 +18,11 @@ namespace Surly.Core.Functions
             var projection = SurlyProjections.GetInstance().Projections
                 .SingleOrDefault(x => x.ProjectionName == tableName.ToUpper());
 
-            if (projection != null) return projection.BuildProjection();
+            if (projection != null)
+            {
+                projection.PrintProjection();
+                return null;
+            }
             
             WriteLine($"\n\t{tableName.ToUpper()} not found.", Red);
 

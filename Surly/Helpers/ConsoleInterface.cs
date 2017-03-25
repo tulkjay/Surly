@@ -177,7 +177,9 @@ namespace Surly.Helpers
             {
                 "RELATION <table-name> (<attribute-name> <attribute-type> <attribute-maximum-length>, ...);",
                 "INSERT <table-name> <attribute-value-n> <attribute-value-n + 1> ... ;",
-                "PRINT <table-name>, ... ;"
+                "PRINT <table-name>, ... ;", 
+                "DELETE <table-name>;",
+                "<projection-name> = PROJECT <attribute-name>, <attribute-name>, ... FROM <table-name>;"
             };
 
             WriteLine("\n" + string.Empty.PadRight(110, '='), Green);
