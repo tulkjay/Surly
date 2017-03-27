@@ -127,13 +127,13 @@ namespace Surly.Core.Functions
                 };
 
                 projection = Validate(database, projection);
-
+                Console.WriteLine("projection is, after validation: " + projection.ProjectionName);
                 if (projection == null) return;
 
                 //Add projection definition
                 Projections.Projections.AddLast(projection);
 
-                WriteLine($"\n\tNew projection added: {projectionName}", Green);
+                WriteLine($"\n\tNew projection added: {projection.ProjectionName}", Green);
             }
             catch (Exception)
             {
@@ -162,8 +162,20 @@ namespace Surly.Core.Functions
                 //Rename projection
                 if (!existingProjection) continue;
 
-                WriteLine("Projection already exists, enter new: ");
-                projection.ProjectionName = Console.ReadLine();
+                Write("\nProjection already exists, enter new projection name: ", Yellow);
+
+                string newProjectionName;
+                do
+                {
+                    newProjectionName = Console.ReadLine();
+
+                    if(string.IsNullOrWhiteSpace(newProjectionName)) Write("Please enter a valid projection name: ", Red);
+
+                } while (string.IsNullOrWhiteSpace(newProjectionName));
+                
+                projection.ProjectionName = newProjectionName.ToUpper();
+
+                existingProjection = Projections.Projections.Any(x => x.ProjectionName == projection.ProjectionName);
             } while (existingProjection);
 
             return projection;

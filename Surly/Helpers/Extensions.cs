@@ -101,11 +101,14 @@ namespace Surly.Helpers
 
                 quotedString = quotedString.Replace("'", "");
 
-                temp.Split(delimiter).ToList().ForEach(x => result.Add(x));
+                temp.Split(delimiter).ToList().ForEach(x =>
+                {
+                    if (!string.IsNullOrWhiteSpace(x)) result.Add(x);
+                });
 
                 result.Add(quotedString);
 
-                text = text.Replace(temp, "");
+                if (!string.IsNullOrWhiteSpace(temp)) text = text.Replace(temp, "");
 
                 text.Split(delimiter)
                     .ToList()
