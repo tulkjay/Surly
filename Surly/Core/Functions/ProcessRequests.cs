@@ -10,9 +10,15 @@ namespace Surly.Core.Functions
         public static void ExecuteQuery(this SurlyDatabase database, string line)
         {
             Set(Cyan);
-            if (line.Contains("="))
+
+            if (line.ToUpper().Contains("PROJECT"))
             {
                 database.Project(line);
+                return;
+            }
+            if (line.ToUpper().Contains("VIEW"))
+            {
+                database.CreateView(line);
                 return;
             }
 
@@ -28,22 +34,35 @@ namespace Surly.Core.Functions
                     var rowAdded = database.AddTuples(steps[1].ToUpper(), line);
 
                     if (rowAdded)
-                        WriteLine($"Row added to {steps[1].ToUpper()}", Green);
+                        WriteLine($"\tRow added to {steps[1].ToUpper()}", Green);
                     break;
 
                 case "PRINT":
                     Set(Cyan);
 
-                    database.PrintTables(line.Replace(",", "").Split(' ').ToList());
+                    if (line.ToUpper().Contains("PRINT CATALOG"))
+                    {
+                        database.PrintCatalog();
+                        return;
+                    }
+
+                    database.PrintTables(line.Replace(",", "").Replace(";", "").Split(' ').ToList());
 
                     Set(Magenta);
                     break;
 
                 case "DELETE":
-                    var tableDeleted = database.DeleteTable(steps[1].ToUpper(), line);
+                    var tableDeleted = database.DestroyTable(steps[1].Replace(";", "").ToUpper(), line);
 
                     if (tableDeleted)
-                        WriteLine($"\n\tDeleted Table Named {steps[1].ToUpper()}", Green);
+                        WriteLine($"\n\tDeleted {steps[1].ToUpper()}", Green);
+                    break;
+                
+                case "DESTROY":
+                    var tableDestroyed = database.DeleteTable(steps[1].Replace(";", "").ToUpper(), line);
+
+                    if (tableDestroyed)
+                        WriteLine($"\n\tDestroyed {steps[1].ToUpper()}", Green);
                     break;
 
                 default:

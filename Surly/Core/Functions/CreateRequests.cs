@@ -15,7 +15,7 @@ namespace Surly.Core.Functions
         {
             if (database.Tables.All(x => x.Name != tableName))
             {
-                WriteLine($"Table {tableName.ToUpper()} was not found.", Red);
+                WriteLine($"\n\tTable {tableName.ToUpper()} was not found.", Red);
                 return false;
             }
 
@@ -26,7 +26,11 @@ namespace Surly.Core.Functions
             var newTuple = new LinkedList<SurlyAttribute>();
 
             for (var i = 0; i < schema.Length; i++)
-                newTuple.AddLast(new SurlyAttribute {Value = tuples[i].To(schema[i].Type, schema[i].Maximum)});
+                newTuple.AddLast(new SurlyAttribute
+                {
+                    Value = tuples[i].To(schema[i].Type, schema[i].Maximum),
+                    Name = schema[i].Name
+                });
 
             if (newTuple.Count <= 0) return false;
 

@@ -41,12 +41,15 @@
     <Compile Include="Core\Constants.cs" />
     <Compile Include="Core\Functions\DeleteRequests.cs" />
     <Compile Include="Core\Functions\CreateRequests.cs" />
+    <Compile Include="Core\Functions\DestroyRequest.cs" />
     <Compile Include="Core\Functions\PrintRequests.cs" />
     <Compile Include="Core\Functions\ProcessRequests.cs" />
     <Compile Include="Core\Functions\ProjectRequests.cs" />
+    <Compile Include="Core\Functions\ViewRequests.cs" />
     <Compile Include="Core\Structure\SurlyAttribute.cs" />
     <Compile Include="Core\Structure\SurlyAttributeSchema.cs" />
     <Compile Include="Core\Structure\SurlyDatabase.cs" />
+    <Compile Include="Core\Structure\SurlyProjection.cs" />
     <Compile Include="Core\Structure\SurlyProjections.cs" />
     <Compile Include="Core\Structure\SurlyTable.cs" />
     <Compile Include="Core\Structure\SurlyTuple.cs" />
@@ -62,6 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="surly.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Surly2Script.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

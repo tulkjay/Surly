@@ -46,7 +46,7 @@ namespace Surly.Helpers
             var path = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(path) || path == "default")
-                path = Constants.SurlyInputFile;
+                path = Constants.Surly2InputFile;
 
             reader.ParseFile(path);
         }

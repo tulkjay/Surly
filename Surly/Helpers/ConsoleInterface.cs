@@ -188,7 +188,9 @@ namespace Surly.Helpers
                 "INSERT <table-name> <attribute-value-n> <attribute-value-n + 1> ... ;",
                 "PRINT <table-name>, ... ;", 
                 "DELETE <table-name>;",
-                "<projection-name> = PROJECT <attribute-name>, <attribute-name>, ... FROM <table-name>;"
+                "DESTROY <table-name>;",
+                "<projection-name> = PROJECT <attribute-name>, <attribute-name>, ... FROM <table-name>;",
+                "<view-name> = VIEW <attribute-name>, <attribute-name>, ... FROM <table-name>;"
             };
 
             WriteLine("\n" + string.Empty.PadRight(110, '='), Green);

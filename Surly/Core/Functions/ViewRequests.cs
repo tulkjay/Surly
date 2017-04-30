@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -8,12 +8,16 @@ using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Core.Functions
 {
-    public static class ProjectRequests
+    public static class ViewRequests
     {
         private static readonly SurlyProjections Projections = SurlyProjections.GetInstance();
 
-        public static void Project(this SurlyDatabase database, string query)
+        //In Development...
+        public static void CreateView(this SurlyDatabase database, string query)
         {
+            WriteLine("The VIEW command is still in development, please try again later.", Yellow);
+            return;
+
             //If the syntax is wrong, the regex with throw an exception
             try
             {
@@ -26,7 +30,7 @@ namespace Surly.Core.Functions
                     .ToUpper()
                     .Trim();
 
-                var attributeNamesRegex = new Regex("project (.+) from", RegexOptions.IgnoreCase)
+                var attributeNamesRegex = new Regex("view (.+) from", RegexOptions.IgnoreCase)
                     .Match(query)
                     .Groups[1]
                     .Captures[0]
@@ -55,54 +59,23 @@ namespace Surly.Core.Functions
                 {
                     ProjectionName = projectionName,
                     TableName = tableName,
-                    AttributeNames = new LinkedList<SurlyAttributeSchema>(),
-                    Tuples = new LinkedList<LinkedList<SurlyAttribute>>()
+                    // AttributeNames = attributeNames
                 };
 
                 projection = Validate(database, projection);
 
                 if (projection == null) return;
 
-                //Clone projected data to new projection
-                var schemaDefinition = new LinkedList<SurlyAttributeSchema>();
-                var castedList = new LinkedList<LinkedList<SurlyAttribute>>();
-
-                var table = database.GetTable(tableName);
-                foreach (var attributeName in attributeNames)
-                {
-                    var selectedTuplesSchemata = table.Schema.Single(x => x.Name == attributeName);
-
-                    schemaDefinition.AddLast(new SurlyAttributeSchema { Maximum = selectedTuplesSchemata.Maximum, Name = selectedTuplesSchemata.Name });
-                }
-
-                var selectedTuples =
-                    table.Tuples.Select(y => y.Select(z => z).Where(z => attributeNames.Contains(z.Name)));
-
-                foreach (var tupleList in selectedTuples)
-                {
-                    var list = new LinkedList<SurlyAttribute>();
-
-                    foreach (var attribute in tupleList)
-                    {
-                        list.AddLast(attribute);
-                    }
-                    castedList.AddLast(list);
-                }
-
-                projection.AttributeNames = schemaDefinition;
-                projection.Tuples = castedList;
-
-                //Add projection
+                //Add projection definition
                 Projections.Projections.AddLast(projection);
 
-                WriteLine($"\n\tNew projection added: {projection.ProjectionName}", Green);
+                WriteLine($"\n\tNew view added: {projection.ProjectionName}", Green);
             }
             catch (Exception)
             {
-                Console.WriteLine("Invalid syntax for PROJECT, see help.");
+                Console.WriteLine("Invalid syntax for VIEW, see help.");
             }
         }
-        
         private static SurlyProjection Validate(SurlyDatabase database, SurlyProjection projection)
         {
             var table = database.GetTable(projection.TableName);

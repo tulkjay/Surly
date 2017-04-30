@@ -20,11 +20,15 @@ namespace Surly.Core.Functions
 
             if (projection != null)
             {
-                projection.PrintProjection();
-                return null;
+                return new SurlyTable
+                {
+                    Name = projection.ProjectionName,
+                    Schema = projection.AttributeNames,
+                    Tuples = projection.Tuples
+                };
             }
             
-            WriteLine($"\n\t{tableName.ToUpper()} not found.", Red);
+            WriteLine($"\n\t{tableName.ToUpper()} was not found.", Red);
 
             return null;
         }
@@ -42,7 +46,7 @@ namespace Surly.Core.Functions
             {
                 if (table == null) continue;
 
-                WriteLine($"\n\tTable: {table.Name}");
+                WriteLine($"\n\t{table.Name}");
                 Console.WriteLine();
 
                 Console.Write($"  {id.PadRight(8)}");

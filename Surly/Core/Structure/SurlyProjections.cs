@@ -12,11 +12,4 @@ namespace Surly.Core.Structure
 
         public static SurlyProjections GetInstance() => _instance ?? (_instance = new SurlyProjections());        
     }
-
-    public class SurlyProjection
-    {
-        public string ProjectionName { get; set; }
-        public LinkedList<string> AttributeNames { get; set; }
-        public string TableName { get; set; }
-    } 
 }
