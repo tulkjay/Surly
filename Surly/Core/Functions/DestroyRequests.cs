@@ -5,9 +5,9 @@ using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Core.Functions
 {
-    public static class DeleteRequests
+    public static class DestroyRequests
     {
-        public static bool DeleteTable(this SurlyDatabase database, string tableName, string line)
+        public static bool DestroyTable(this SurlyDatabase database, string tableName, string line)
         {
             if (database.Tables.All(x => x.Name != tableName))
             {

@@ -39,9 +39,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Constants.cs" />
-    <Compile Include="Core\Functions\DeleteRequests.cs" />
+    <Compile Include="Core\Functions\DestroyRequests.cs" />
     <Compile Include="Core\Functions\CreateRequests.cs" />
-    <Compile Include="Core\Functions\DestroyRequest.cs" />
+    <Compile Include="Core\Functions\DeleteRequest.cs" />
     <Compile Include="Core\Functions\PrintRequests.cs" />
     <Compile Include="Core\Functions\ProcessRequests.cs" />
     <Compile Include="Core\Functions\ProjectRequests.cs" />

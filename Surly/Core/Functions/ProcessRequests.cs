@@ -52,14 +52,14 @@ namespace Surly.Core.Functions
                     break;
 
                 case "DELETE":
-                    var tableDeleted = database.DestroyTable(steps[1].Replace(";", "").ToUpper(), line);
+                    var tableDeleted = database.DeleteTable(steps[1].Replace(";", "").ToUpper(), line);
 
                     if (tableDeleted)
                         WriteLine($"\n\tDeleted {steps[1].ToUpper()}", Green);
                     break;
                 
                 case "DESTROY":
-                    var tableDestroyed = database.DeleteTable(steps[1].Replace(";", "").ToUpper(), line);
+                    var tableDestroyed = database.DestroyTable(steps[1].Replace(";", "").ToUpper(), line);
 
                     if (tableDestroyed)
                         WriteLine($"\n\tDestroyed {steps[1].ToUpper()}", Green);
