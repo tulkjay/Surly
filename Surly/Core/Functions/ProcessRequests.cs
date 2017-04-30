@@ -22,19 +22,19 @@ namespace Surly.Core.Functions
                 return;
             }
             if (line.ToUpper().Contains("SELECT"))
-            {                                
+            {
                 var resultTable = database.HandleSelect(line);
 
                 if (resultTable)
-                    WriteLine("Success", Green);                
+                    WriteLine("Success", Green);
                 return;
             }
             if (line.ToUpper().Contains("JOIN"))
-            {                                
+            {
                 var success = database.Join(line);
 
                 if (success)
-                    WriteLine("Success", Green);                
+                    WriteLine("Success", Green);
                 return;
             }
 
@@ -73,7 +73,7 @@ namespace Surly.Core.Functions
                     if (tableDeleted)
                         WriteLine($"\n\tDeleted {steps[1].ToUpper()}", Green);
                     break;
-                
+
                 case "DESTROY":
                     var tableDestroyed = database.DestroyTable(steps[1].Replace(";", "").ToUpper(), line);
 

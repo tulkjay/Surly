@@ -24,7 +24,9 @@ namespace Surly.Core.Functions
 
             if (ProjectionsContainer.Projections.Any(x => x.ProjectionName == projection.ProjectionName))
             {
-                WriteLine($"Projection {projection.ProjectionName.ToUpper()} already exists, please try a different name.", Red);
+                WriteLine(
+                    $"Projection {projection.ProjectionName.ToUpper()} already exists, please try a different name.",
+                    Red);
                 return false;
             }
 
@@ -68,12 +70,12 @@ namespace Surly.Core.Functions
                     .Trim()
                     .Split(' ');
             }
-            catch (Exception )
+            catch (Exception)
             {
                 Console.WriteLine("Invalid syntax for JOIN, see help.");
                 return null;
             }
-            
+
             var tableNames = new LinkedList<string>();
             var tables = new List<SurlyTable>();
             var attributeNames = new LinkedList<SurlyAttributeSchema>();
@@ -82,7 +84,7 @@ namespace Surly.Core.Functions
             foreach (var tableName in tableNamesRegex)
             {
                 tableNames.AddLast(tableName.Trim());
-                    
+
                 if (!database.Tables.Select(x => x.Name).Contains(tableName.Trim()))
                 {
                     WriteLine($"{tableName.Trim()} not found", Red);
@@ -91,25 +93,25 @@ namespace Surly.Core.Functions
                 var tempTable = database.GetTable(tableName.Trim());
 
                 attributeNames.Combine(tempTable.Schema);
-                    
-                tables.Add(tempTable); 
+
+                tables.Add(tempTable);
             }
 
             var leftTableRows = tables[0].Tuples.ToList();
             var rightTableRows = tables[1].Tuples;
 
-            leftTableRows.ForEach(row => resultSet = resultSet.Combine(row.ApplyCondition(rightTableRows, joinCondition)));                        
-             
+            leftTableRows.ForEach(
+                row => resultSet = resultSet.Combine(row.ApplyCondition(rightTableRows, joinCondition)));
+
             var projection = new SurlyProjection
             {
                 ProjectionName = projectionName.ToUpper(),
                 TableName = projectionName.ToUpper(),
                 AttributeNames = attributeNames,
                 Tuples = resultSet
-            };           
+            };
 
             return projection;
-            
         }
 
 
@@ -122,7 +124,9 @@ namespace Surly.Core.Functions
             return baseList;
         }
 
-        public static LinkedList<LinkedList<SurlyAttribute>> ApplyCondition(this LinkedList<SurlyAttribute> baseTableRow, LinkedList<LinkedList<SurlyAttribute>> comparingTable, string[] condition)
+        public static LinkedList<LinkedList<SurlyAttribute>> ApplyCondition(
+            this LinkedList<SurlyAttribute> baseTableRow, LinkedList<LinkedList<SurlyAttribute>> comparingTable,
+            string[] condition)
         {
             if (condition.Length != 3)
             {
@@ -134,15 +138,11 @@ namespace Surly.Core.Functions
 
             comparingTable.ToList().ForEach(rightRow =>
             {
-                //WriteLine($"{baseTableRow.Single(x => x.Name == condition[0]).Value} vs {rightRow.Single(x => x.Name == condition[2]).Value}");
-                //WriteLine($"equals {baseTableRow.Single(x => x.Name == condition[0]).Value.Equals(rightRow.Single(x => x.Name == condition[2]).Value)}");
-                //WriteLine($"== {baseTableRow.Single(x => x.Name == condition[0]).Value.Equals(rightRow.Single(x => x.Name == condition[2]).Value)}");
-
-                if (baseTableRow.First(x => x.Name == condition[0]).Value.Equals(rightRow.First(x => x.Name == condition[2]).Value))
-                {
+                if (
+                    baseTableRow.First(x => x.Name == condition[0])
+                        .Value.Equals(rightRow.First(x => x.Name == condition[2]).Value))
                     result.AddLast(baseTableRow.Combine(rightRow));
-                }
-            });            
+            });
 
             return result;
         }

@@ -24,13 +24,27 @@ namespace Surly.Core.Functions
 
             var newTuple = new LinkedList<SurlyAttribute>();
 
+            newTuple.AddLast(new SurlyAttribute
+            {
+                Name = "ID",
+                Value = table.Tuples.Count + 1
+            });
+
             for (var i = 0; i < schema.Length; i++)
+            {
+                if (schema[i].Name == "ID")
+                {
+                    continue;
+                }
+
                 newTuple.AddLast(new SurlyAttribute
-                {                    
-                    Value = tuples[i].To(schema[i].Type, schema[i].Maximum),
+                {
+                    Value = tuples[i - 1].To(schema[i].Type, schema[i].Maximum),
                     Name = schema[i].Name
                 });
-            
+            }
+
+
             if (newTuple.Count <= 0) return false;
 
             table.Tuples.AddLast(newTuple);
@@ -54,7 +68,7 @@ namespace Surly.Core.Functions
             try
             {
                 tuples = line.Substring(line.IndexOf("(", StringComparison.Ordinal) + 1,
-                        line.IndexOf(")", StringComparison.Ordinal) - line.IndexOf("(", StringComparison.Ordinal) - 1);
+                    line.IndexOf(")", StringComparison.Ordinal) - line.IndexOf("(", StringComparison.Ordinal) - 1);
             }
             catch (Exception)
             {
@@ -81,18 +95,18 @@ namespace Surly.Core.Functions
 
                 database.Tables.Last.Value.Schema.AddLast(new SurlyAttributeSchema
                 {
-                    Name = "Id",
-                    Type = typeof(int),
-                    Maximum = 3
-                });
-
-                database.Tables.Last.Value.Schema.AddLast(new SurlyAttributeSchema
-                {
                     Name = parts[0],
                     Type = parts[1].ToSurlyType(),
                     Maximum = int.TryParse(parts[2], out numMax) ? numMax : 0
                 });
             }
+
+            database.Tables.Last.Value.Schema.AddFirst(new SurlyAttributeSchema
+            {
+                Name = "ID",
+                Type = typeof(int),
+                Maximum = 3
+            });
 
             Console.WriteLine();
         }
