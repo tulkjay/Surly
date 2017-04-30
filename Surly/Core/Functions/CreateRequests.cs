@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Surly.Core.Structure;
 using Surly.Helpers;
 using static System.ConsoleColor;
@@ -27,11 +26,11 @@ namespace Surly.Core.Functions
 
             for (var i = 0; i < schema.Length; i++)
                 newTuple.AddLast(new SurlyAttribute
-                {
+                {                    
                     Value = tuples[i].To(schema[i].Type, schema[i].Maximum),
                     Name = schema[i].Name
                 });
-
+            
             if (newTuple.Count <= 0) return false;
 
             table.Tuples.AddLast(newTuple);
@@ -63,6 +62,7 @@ namespace Surly.Core.Functions
             }
 
             Set(Green);
+
             var tableCreated = false;
 
             foreach (var tuple in tuples.Split(','))
@@ -78,6 +78,13 @@ namespace Surly.Core.Functions
                     tableCreated = true;
                     WriteLine($"\n\tCreating table: {tableName}", Cyan);
                 }
+
+                database.Tables.Last.Value.Schema.AddLast(new SurlyAttributeSchema
+                {
+                    Name = "Id",
+                    Type = typeof(int),
+                    Maximum = 3
+                });
 
                 database.Tables.Last.Value.Schema.AddLast(new SurlyAttributeSchema
                 {

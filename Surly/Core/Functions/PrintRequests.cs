@@ -32,6 +32,7 @@ namespace Surly.Core.Functions
 
             return null;
         }
+
         public static void PrintTables(this SurlyDatabase database, IList<string> query)
         {
             const string id = "Id";

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text.RegularExpressions;
 using Surly.Core.Structure;
+using Surly.Helpers;
 using static System.ConsoleColor;
 using static Surly.Helpers.ConsoleInterface;
 
@@ -12,9 +14,9 @@ namespace Surly.Core.Functions
     {
         private static readonly SurlyProjections Projections = SurlyProjections.GetInstance();
 
-        public static void Project(this SurlyDatabase database, string query)
+        public static SurlyProjection CreateProjection(SurlyDatabase database, string query)
         {
-            //If the syntax is wrong, the regex with throw an exception
+                //If the syntax is wrong, the regex with throw an exception
             try
             {
                 var projectionNameRegex = new Regex("(\\w+) =").Match(query);
@@ -61,49 +63,61 @@ namespace Surly.Core.Functions
 
                 projection = Validate(database, projection);
 
-                if (projection == null) return;
-
-                //Clone projected data to new projection
-                var schemaDefinition = new LinkedList<SurlyAttributeSchema>();
-                var castedList = new LinkedList<LinkedList<SurlyAttribute>>();
-
-                var table = database.GetTable(tableName);
-                foreach (var attributeName in attributeNames)
-                {
-                    var selectedTuplesSchemata = table.Schema.Single(x => x.Name == attributeName);
-
-                    schemaDefinition.AddLast(new SurlyAttributeSchema { Maximum = selectedTuplesSchemata.Maximum, Name = selectedTuplesSchemata.Name });
-                }
-
-                var selectedTuples =
-                    table.Tuples.Select(y => y.Select(z => z).Where(z => attributeNames.Contains(z.Name)));
-
-                foreach (var tupleList in selectedTuples)
-                {
-                    var list = new LinkedList<SurlyAttribute>();
-
-                    foreach (var attribute in tupleList)
-                    {
-                        list.AddLast(attribute);
-                    }
-                    castedList.AddLast(list);
-                }
-
-                projection.AttributeNames = schemaDefinition;
-                projection.Tuples = castedList;
-
-                //Add projection
-                Projections.Projections.AddLast(projection);
-
-                WriteLine($"\n\tNew projection added: {projection.ProjectionName}", Green);
+                return projection;
             }
             catch (Exception)
             {
                 Console.WriteLine("Invalid syntax for PROJECT, see help.");
+                return null;
             }
         }
-        
-        private static SurlyProjection Validate(SurlyDatabase database, SurlyProjection projection)
+
+        public static void Project(this SurlyDatabase database, string query)
+        {
+            var projection = CreateProjection(database, query);
+
+            //Clone projected data to new projection
+            var schemaDefinition = new LinkedList<SurlyAttributeSchema>();
+            var castedList = new LinkedList<LinkedList<SurlyAttribute>>();
+
+            var table = database.GetTable(projection.TableName);
+            foreach (var attribute in projection.AttributeNames)
+            {
+                var selectedTuplesSchemata = table.Schema.Single(x => x.Name == attribute.Name);
+
+                schemaDefinition.AddLast(new SurlyAttributeSchema
+                {
+                    Maximum = selectedTuplesSchemata.Maximum,
+                    Name = selectedTuplesSchemata.Name
+                });
+            }
+
+            var selectedTuples = table.Tuples.Select(y => y.Select(z => z)
+                .Where(z => projection.AttributeNames
+                    .Select(x => x.Name)
+                    .Contains(z.Name)));
+
+            foreach (var tupleList in selectedTuples)
+            {
+                var list = new LinkedList<SurlyAttribute>();
+
+                foreach (var attribute in tupleList)
+                {
+                    list.AddLast(attribute);
+                }
+                castedList.AddLast(list);
+            }
+
+            projection.AttributeNames = schemaDefinition;
+            projection.Tuples = castedList;
+
+            //Add projection
+            Projections.Projections.AddLast(projection);
+
+            WriteLine($"\n\tNew projection added: {projection.ProjectionName}", Green);
+        }
+
+        public static SurlyProjection Validate(SurlyDatabase database, SurlyProjection projection)
         {
             var table = database.GetTable(projection.TableName);
             if (table == null) return null;

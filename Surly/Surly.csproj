@@ -42,9 +42,11 @@
     <Compile Include="Core\Functions\DestroyRequests.cs" />
     <Compile Include="Core\Functions\CreateRequests.cs" />
     <Compile Include="Core\Functions\DeleteRequest.cs" />
+    <Compile Include="Core\Functions\JoinRequests.cs" />
     <Compile Include="Core\Functions\PrintRequests.cs" />
     <Compile Include="Core\Functions\ProcessRequests.cs" />
     <Compile Include="Core\Functions\ProjectRequests.cs" />
+    <Compile Include="Core\Functions\SelectRequest.cs" />
     <Compile Include="Core\Functions\ViewRequests.cs" />
     <Compile Include="Core\Structure\SurlyAttribute.cs" />
     <Compile Include="Core\Structure\SurlyAttributeSchema.cs" />
@@ -55,6 +57,7 @@
     <Compile Include="Core\Structure\SurlyTuple.cs" />
     <Compile Include="Helpers\ConsoleInterface.cs" />
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\OperatorHelper.cs" />
     <Compile Include="Helpers\SurlyFileReader.cs" />
     <Compile Include="Helpers\SurlyFormatter.cs" />
     <Compile Include="Program.cs" />

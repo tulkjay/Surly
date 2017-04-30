@@ -21,6 +21,22 @@ namespace Surly.Core.Functions
                 database.CreateView(line);
                 return;
             }
+            if (line.ToUpper().Contains("SELECT"))
+            {                                
+                var resultTable = database.HandleSelect(line);
+
+                if (resultTable)
+                    WriteLine("Success", Green);                
+                return;
+            }
+            if (line.ToUpper().Contains("JOIN"))
+            {                                
+                var success = database.Join(line);
+
+                if (success)
+                    WriteLine("Success", Green);                
+                return;
+            }
 
             var steps = line.Split(' ').ToList();
 
