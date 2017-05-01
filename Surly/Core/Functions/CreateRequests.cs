@@ -10,12 +10,12 @@ namespace Surly.Core.Functions
 {
     public static class CreateRequests
     {
-        public static bool AddTuples(this SurlyDatabase database, string tableName, string line)
+        public static void AddTuples(this SurlyDatabase database, string tableName, string line)
         {
             if (database.Tables.All(x => x.Name != tableName))
             {
                 WriteLine($"\n\tTable {tableName.ToUpper()} was not found.", Red);
-                return false;
+                return;
             }
 
             var tuples = string.Format(new SurlyFormatter(), "{0:insert}", line).SplitValues();
@@ -45,13 +45,12 @@ namespace Surly.Core.Functions
             }
 
 
-            if (newTuple.Count <= 0) return false;
+            if (newTuple.Count <= 0) return;
 
             table.Tuples.AddLast(newTuple);
 
-            return true;
+            WriteLine($"\tRow added to {tableName.ToUpper()}", Green);            
         }
-
 
         public static void CreateTable(this SurlyDatabase database, string tableName, string line)
         {

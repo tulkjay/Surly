@@ -63,8 +63,8 @@ namespace Surly.Core.Functions
                 return;
             }
 
-            if (printProjection
-                && SurlyProjections.GetInstance().Projections.Any(x => x.ProjectionName == projectionName))
+            if (!printProjection
+                && SurlyProjections.GetInstance().Projections.Any(x => x.ProjectionName.ToUpper() == projectionName?.ToUpper()))
             {
                 WriteLine($"\n\t{projectionName?.ToUpper()} already exists, please choose a different name", Red);
                 return;
@@ -74,7 +74,7 @@ namespace Surly.Core.Functions
 
             tableResponse.Table.Tuples.ToList().ForEach(tableRow =>
             {
-                var valid = Chain(tableRow, true, conditionSteps.ToArray(), 0);
+                var valid = OperatorHelper.Chain(tableRow, true, conditionSteps.ToArray(), 0);
 
                 if (valid)
                 {
@@ -125,39 +125,6 @@ namespace Surly.Core.Functions
             });
 
             WriteLine($"\n\t{projectionName.ToUpper()} build successful.", Green);
-        }
-
-        public static bool Chain(LinkedList<SurlyAttribute> row, bool previousValid, string[] conditionSet, int index)
-        {
-            string attribute;
-            var result = false;
-            if (conditionSet.Length > index + 4)
-            {
-                result = Chain(row, previousValid, conditionSet, index + 4);
-            }
-            else
-            {
-                attribute = row.Single(x => x.Name.ToUpper() == conditionSet[index]).Value.ToString();
-
-                return OperatorHelper.ApplyCondition(attribute, conditionSet[index + 1], conditionSet[index + 2]);
-            }
-            attribute = row.Single(x => x.Name.ToUpper() == conditionSet[index]).Value.ToString();
-
-            var valid = OperatorHelper.ApplyCondition(attribute, conditionSet[index + 1], conditionSet[index + 2]);
-
-            switch (conditionSet[index + 3].ToUpper())
-            {
-                case "AND":
-                    valid = result && valid;
-                    break;
-                case "OR":
-                    valid = result || valid;
-                    break;
-                default:
-                    WriteLine("Invalid operation, please see help.", Red);
-                    return false;
-            }
-            return valid;              
         }
     }
 }

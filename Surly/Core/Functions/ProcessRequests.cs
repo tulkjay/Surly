@@ -31,6 +31,11 @@ namespace Surly.Core.Functions
                 database.Join(line);
                 return;
             }
+            if (line.ToUpper().Contains("PRINT CATALOG"))
+            {
+                database.PrintCatalog();
+                return;
+            }
 
             var steps = line.Split(' ').ToList();
 
@@ -41,42 +46,23 @@ namespace Surly.Core.Functions
                     break;
 
                 case "INSERT":
-                    var rowAdded = database.AddTuples(steps[1].ToUpper(), line);
-
-                    if (rowAdded)
-                        WriteLine($"\tRow added to {steps[1].ToUpper()}", Green);
+                    database.AddTuples(steps[1].ToUpper(), line);                                            
                     break;
 
                 case "PRINT":
-                    Set(Cyan);
-
-                    if (line.ToUpper().Contains("PRINT CATALOG"))
-                    {
-                        database.PrintCatalog();
-                        return;
-                    }
-
-                    database.Print(line.Replace(",", "").Replace(";", "").Split(' ').ToList());
-
-                    Set(Magenta);
+                    database.Print(line);
                     break;
 
                 case "DELETE":
-                    var tableDeleted = database.DeleteTable(steps[1].Replace(";", "").ToUpper(), line);
-
-                    if (tableDeleted)
-                        WriteLine($"\n\tDeleted {steps[1].ToUpper()}", Green);
+                    database.Delete(steps[1], line);
                     break;
 
                 case "DESTROY":
-                    var tableDestroyed = database.DestroyTable(steps[1].Replace(";", "").ToUpper(), line);
-
-                    if (tableDestroyed)
-                        WriteLine($"\n\tDestroyed {steps[1].ToUpper()}", Green);
+                    database.DestroyTable(steps[1].Replace(";", "").ToUpper(), line);    
                     break;
 
                 default:
-                    WriteLine($"\n\tNot sure about this command: {steps[0].ToUpper()}", Red);
+                    WriteLine($"\n\tUnknown command: {steps[0].ToUpper()}, please see help for recognized commands", Red);
                     break;
             }
         }

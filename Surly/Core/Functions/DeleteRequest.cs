@@ -1,26 +1,77 @@
-﻿using Surly.Core.Structure;
+﻿using System;
+using Surly.Core.Structure;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Surly.Helpers;
 using static System.ConsoleColor;
 using static Surly.Helpers.ConsoleInterface;
-
 
 namespace Surly.Core.Functions
 {
     public static class DeleteRequest
     {
-        public static bool DeleteTable(this SurlyDatabase database, string tableName, string line)
+        public static void Delete(this SurlyDatabase database, string tableName, string line)
         {
-            var table = database.Tables.SingleOrDefault(x => x.Name == tableName);
-
-            if (table == null)
+            if (line.ToUpper().Contains("WHERE"))
             {
-                WriteLine($"\n\t{tableName} was not found.", Red);
-                return false;
-            }            
+                database.DeleteTableWithConditions(tableName, line);
+                return;
+            }
 
-            table.Tuples.Clear();
+            database.DeleteTable(tableName.Replace(";", "").ToUpper(), line);
+        }
 
-            return true;
+        public static void DeleteTable(this SurlyDatabase database, string tableName, string line)
+        {
+            var tableResponse = database.GetTable(tableName);
+
+            if (tableResponse.Table == null) return;
+
+            tableResponse.Table.Tuples.Clear();
+
+            WriteLine($"\n\tDeleted {tableName.ToUpper()}", Green);
+        }
+
+        public static void DeleteTableWithConditions(this SurlyDatabase database, string tableName, string line)
+        {
+            var tableResponse = database.GetTable(tableName);
+
+            if (tableResponse.Table == null) return;
+
+            string[] conditions = null;
+            try
+            {
+                conditions = new Regex("where (.+);", RegexOptions.IgnoreCase)
+                    .Match(line)
+                    .Groups[1]
+                    .Captures[0]
+                    .ToString()
+                    .ToUpper()
+                    .Split(' ');
+            }
+            catch (Exception)
+            {
+                WriteLine("Invalid syntax, please see help.", Red);
+            }
+
+            if (conditions == null) return;
+            var success = false;
+
+            tableResponse.Table.Tuples.ToList().ForEach(tableRow =>
+            {
+                var match = OperatorHelper.Chain(tableRow, true, conditions, 0);
+
+                if (match)
+                {
+                    tableResponse.Table.Tuples.Remove(tableRow);
+                    success = true;
+                }
+            });
+
+            if (success)
+                WriteLine("\n\tSuccess", Green);
+            else
+                WriteLine("No rows affected.");
         }
     }
 }

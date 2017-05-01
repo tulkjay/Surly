@@ -95,8 +95,14 @@ namespace Surly.Core.Functions
                 Console.WriteLine();
             }
         }
-        public static void Print(this SurlyDatabase database, IList<string> query)
+        public static void Print(this SurlyDatabase database, string line)
         {
+            var query = line
+                .Replace(",", "")
+                .Replace(";", "")
+                .Split(' ')
+                .ToList();
+
             query.RemoveAt(0);
 
             var tablesQueryResponse = query                

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,42 @@ namespace Surly.Helpers
 {
     public static class OperatorHelper
     {
+        public static bool Chain(LinkedList<SurlyAttribute> row, bool previousValid, string[] conditionSet, int index)
+        {
+            string attribute;
+            bool result;
+
+            if (conditionSet.Length > index + 4)
+            {
+                result = Chain(row, previousValid, conditionSet, index + 4);
+            }
+            else
+            {
+                attribute = row.Single(x => x.Name.ToUpper() == conditionSet[index]).Value.ToString();
+
+                return OperatorHelper.ApplyCondition(attribute, conditionSet[index + 1], conditionSet[index + 2]);
+            }
+
+            attribute = row.Single(x => x.Name.ToUpper() == conditionSet[index]).Value.ToString();
+
+            var valid = OperatorHelper.ApplyCondition(attribute, conditionSet[index + 1], conditionSet[index + 2]);
+
+            switch (conditionSet[index + 3].ToUpper())
+            {
+                case "AND":
+                    valid = result && valid;
+                    break;
+                case "OR":
+                    valid = result || valid;
+                    break;
+                default:
+                    WriteLine("Invalid operation, please see help.", Red);
+                    return false;
+            }
+
+            return valid;
+        }
+
         public static bool ApplyCondition(string leftOperand, string oprtr, string rightOperand)
         {
             switch (oprtr)
@@ -22,9 +59,9 @@ namespace Surly.Helpers
 
                 case ">":
                     int greaterThanLeft;
-                    var validGtLeft = int.TryParse(leftOperand, out greaterThanLeft);
+                    var validGtLeft = Int32.TryParse(leftOperand, out greaterThanLeft);
                     int greaterThanRight;
-                    var validGtRight = int.TryParse(rightOperand, out greaterThanRight);
+                    var validGtRight = Int32.TryParse(rightOperand, out greaterThanRight);
 
                     if (!validGtLeft || !validGtRight)
                     {
@@ -36,9 +73,9 @@ namespace Surly.Helpers
 
                 case "<":
                     int lessThanLeft;
-                    var validLtLeft = int.TryParse(leftOperand, out lessThanLeft);
+                    var validLtLeft = Int32.TryParse(leftOperand, out lessThanLeft);
                     int lessThanRight;
-                    var validLtRight = int.TryParse(rightOperand, out lessThanRight);
+                    var validLtRight = Int32.TryParse(rightOperand, out lessThanRight);
 
                     if (!validLtLeft || !validLtRight)
                     {
