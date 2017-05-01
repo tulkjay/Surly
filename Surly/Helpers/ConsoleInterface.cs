@@ -83,7 +83,7 @@ namespace Surly.Helpers
             Console.WriteLine("\t5. Help");
             Console.WriteLine("\t6. Exit");
 
-            Set(Blue);
+            Set(Green);
             Console.Write("\nPlease make a selection: ");
             Set(Magenta);
         }

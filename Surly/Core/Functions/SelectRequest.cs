@@ -107,7 +107,7 @@ namespace Surly.Core.Functions
                         Name = "Results",
                         Tuples = _resultSet
                     },
-                    HideIndexes = true
+                    //HideIndexes = true
                 };
 
                 database.PrintTables(new List<SurlyTableResponse> {response});

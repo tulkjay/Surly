@@ -136,10 +136,12 @@ namespace Surly.Core.Functions
             return baseList;
         }
 
-        public static LinkedList<LinkedList<SurlyAttribute>> ApplyCondition( this LinkedList<SurlyAttribute> baseTableRow, 
-            LinkedList<LinkedList<SurlyAttribute>> comparingTable,
+        public static LinkedList<LinkedList<SurlyAttribute>> ApplyCondition( this LinkedList<SurlyAttribute> baseRow, 
+            LinkedList<LinkedList<SurlyAttribute>> rTable,
             string[] condition)
         {
+            var baseTableRow = new LinkedList<SurlyAttribute>(baseRow);
+
             if (condition.Length != 3)
             {
                 WriteLine("\n\tInvalid syntax for JOIN condition, please see help", Red);
@@ -148,6 +150,7 @@ namespace Surly.Core.Functions
 
             var tempResult = new LinkedList<LinkedList<SurlyAttribute>>();
 
+            var comparingTable = new LinkedList<LinkedList<SurlyAttribute>>(rTable);
             comparingTable.ToList().ForEach(rightRow =>
             {
                 if (baseTableRow.First(x => x.Name.ToUpper() == condition[0]).Value

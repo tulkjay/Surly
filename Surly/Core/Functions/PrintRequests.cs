@@ -64,7 +64,7 @@ namespace Surly.Core.Functions
 
                 var count = 1;
 
-                WriteLine("\n" + string.Empty.PadRight(response.HideIndexes ? 165 : 100, '='), Green);
+                WriteLine("\n" + string.Empty.PadRight(widthReferences.Sum() + 10, '='), Green);
 
                 Set(Yellow);
 
