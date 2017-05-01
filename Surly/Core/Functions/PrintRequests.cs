@@ -159,7 +159,7 @@ namespace Surly.Core.Functions
             {
                 WriteLine($"\n\tTable: {table.Name}\n");
 
-                Console.Write($"  {id.PadRight(8)}");
+                Console.Write($"  ");//{id.PadRight(8)}");
 
                 var widthReferences = new List<int>();
 
@@ -180,7 +180,7 @@ namespace Surly.Core.Functions
                 foreach (var tableTuple in table.Tuples)
                 {
                     var index = 0;
-                    Console.Write($"  {count.ToString().PadRight(8)}");
+                    Console.Write($"  ");//{count.ToString().PadRight(8)}");
 
                     foreach (var attribute in tableTuple)
                     {
