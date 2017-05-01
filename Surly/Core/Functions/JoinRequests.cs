@@ -12,14 +12,14 @@ namespace Surly.Core.Functions
     {
         public static SurlyProjections ProjectionsContainer = SurlyProjections.GetInstance();
 
-        public static bool Join(this SurlyDatabase database, string query)
+        public static void Join(this SurlyDatabase database, string query)
         {
             var projection = CreateJoinProjection(database, query);
 
             if (projection == null)
             {
                 WriteLine("Error adding projection", Red);
-                return false;
+                return;
             }
 
             if (ProjectionsContainer.Projections.Any(x => x.ProjectionName == projection.ProjectionName))
@@ -27,12 +27,11 @@ namespace Surly.Core.Functions
                 WriteLine(
                     $"Projection {projection.ProjectionName.ToUpper()} already exists, please try a different name.",
                     Red);
-                return false;
+                return;
             }
 
             ProjectionsContainer.Projections.AddLast(projection);
-
-            return true;
+            WriteLine($"{projection.ProjectionName.ToUpper()} build successful", Green);
         }
 
         public static SurlyProjection CreateJoinProjection(SurlyDatabase database, string query)
@@ -85,16 +84,17 @@ namespace Surly.Core.Functions
             {
                 tableNames.AddLast(tableName.Trim());
 
-                if (!database.Tables.Select(x => x.Name).Contains(tableName.Trim()))
+                var tempTableResponse = database.GetTable(tableName.Trim());
+
+                if (tempTableResponse.Table == null)
                 {
                     WriteLine($"{tableName.Trim()} not found", Red);
                     return null;
-                }
-                var tempTable = database.GetTable(tableName.Trim());
+                }                
 
-                attributeNames.Combine(tempTable.Schema);
+                attributeNames.Combine(tempTableResponse.Table.Schema);
 
-                tables.Add(tempTable);
+                tables.Add(tempTableResponse.Table);
             }
 
             var leftTableRows = tables[0].Tuples.ToList();
@@ -108,7 +108,8 @@ namespace Surly.Core.Functions
                 ProjectionName = projectionName.ToUpper(),
                 TableName = projectionName.ToUpper(),
                 AttributeNames = attributeNames,
-                Tuples = resultSet
+                Tuples = resultSet,
+                HideIndex = true
             };
 
             return projection;
@@ -119,13 +120,22 @@ namespace Surly.Core.Functions
         {
             foreach (var surlyAttribute in newList)
             {
+                if (typeof(T) == typeof(SurlyAttribute) || typeof(T) == typeof(SurlyAttributeSchema))
+                {
+                    if ((surlyAttribute as SurlyAttribute)?.Name == "Id")
+                        continue;
+
+                    if ((surlyAttribute as SurlyAttributeSchema)?.Name == "Id")
+                        continue;
+                }
+
                 baseList.AddLast(surlyAttribute);
             }
             return baseList;
         }
 
-        public static LinkedList<LinkedList<SurlyAttribute>> ApplyCondition(
-            this LinkedList<SurlyAttribute> baseTableRow, LinkedList<LinkedList<SurlyAttribute>> comparingTable,
+        public static LinkedList<LinkedList<SurlyAttribute>> ApplyCondition( this LinkedList<SurlyAttribute> baseTableRow, 
+            LinkedList<LinkedList<SurlyAttribute>> comparingTable,
             string[] condition)
         {
             if (condition.Length != 3)
@@ -134,17 +144,33 @@ namespace Surly.Core.Functions
                 return null;
             }
 
-            var result = new LinkedList<LinkedList<SurlyAttribute>>();
+            var tempResult = new LinkedList<LinkedList<SurlyAttribute>>();
 
             comparingTable.ToList().ForEach(rightRow =>
             {
-                if (
-                    baseTableRow.First(x => x.Name == condition[0])
-                        .Value.Equals(rightRow.First(x => x.Name == condition[2]).Value))
-                    result.AddLast(baseTableRow.Combine(rightRow));
+                if (baseTableRow.First(x => x.Name.ToUpper() == condition[0]).Value
+                    .Equals(rightRow.First(x => x.Name.ToUpper() == condition[2]).Value))
+                {                    
+                    tempResult.AddLast(baseTableRow.Combine(rightRow));
+                }                    
             });
 
-            return result;
+            var resultSet = new LinkedList<LinkedList<SurlyAttribute>>();
+            var resultAttribute = new LinkedList<SurlyAttribute>();
+
+            foreach (var surlyAttributes in tempResult)
+            {
+                foreach (var surlyAttribute in surlyAttributes)
+                {
+                    if (surlyAttribute.Name != "Id")
+                    {
+                        resultAttribute.AddLast(surlyAttribute);
+                    }
+                }
+                resultSet.AddLast(resultAttribute);
+            }
+
+            return resultSet;
         }
     }
 }

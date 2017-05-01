@@ -9,22 +9,29 @@ namespace Surly.Core.Functions
 {
     public static class PrintRequests
     {
-        public static SurlyTable GetTable(this SurlyDatabase database, string tableName)
+        const string Id = "Id";
+
+        public static SurlyTableResponse GetTable(this SurlyDatabase database, string tableName)
         {
             var table = database.Tables.SingleOrDefault(x => x.Name == tableName.ToUpper());
 
-            if (table != null) return table;
+            if (table != null) return new SurlyTableResponse {Table = table};
 
             var projection = SurlyProjections.GetInstance().Projections
                 .SingleOrDefault(x => x.ProjectionName == tableName.ToUpper());
 
             if (projection != null)
             {
-                return new SurlyTable
+                return new SurlyTableResponse
                 {
-                    Name = projection.ProjectionName,
-                    Schema = projection.AttributeNames,
-                    Tuples = projection.Tuples
+                    Table = new SurlyTable
+                    {
+                        Name = projection.ProjectionName,
+                        Schema = projection.AttributeNames,
+                        Tuples = projection.Tuples,
+                    },
+                    IsProjection = true,
+                    HideIndexes = projection.HideIndex
                 };
             }
             
@@ -33,50 +40,52 @@ namespace Surly.Core.Functions
             return null;
         }
 
-        public static void PrintTables(this SurlyDatabase database, IList<string> query)
+        public static void PrintTables(this SurlyDatabase database, IList<SurlyTableResponse> tables)
         {
-            const string id = "Id";
-
-            query.RemoveAt(0);
-
-            var tables = query                
-                .Select(database.GetTable)
-                .ToList();                
-
-            foreach (var table in tables)
+            foreach (var response in tables)
             {
-                if (table == null) continue;
+                if (response == null) continue;
 
-                WriteLine($"\n\t{table.Name}");
+                WriteLine($"\n\t{response.Table.Name}");
                 Console.WriteLine();
 
-                Console.Write($"  {id.PadRight(8)}");
+                Console.Write($"  {(response.IsProjection ? Id.PadRight(8) : "")}");
 
                 var widthReferences = new List<int>();
 
-                foreach (var schema in table.Schema)
+                foreach (var schema in response.Table.Schema)
                 {
                     var tableWidth = Math.Max(schema.Maximum + 2, schema.Name.Length + 2);
 
                     Console.Write($"{schema.Name.PadRight(tableWidth)}");
+
                     widthReferences.Add(tableWidth);
                 }
 
                 var count = 1;
 
-                WriteLine("\n" + string.Empty.PadRight(100, '='), Green);
+                WriteLine("\n" + string.Empty.PadRight(response.HideIndexes ? 165 : 100, '='), Green);
 
                 Set(Yellow);
 
-                foreach (var tableTuple in table.Tuples)
+                foreach (var tableTuple in response.Table.Tuples)
                 {
                     var index = 0;
-                    Console.Write($"  {count.ToString().PadRight(8)}");
+
+                    Console.Write($"  {(response.IsProjection ? count.ToString().PadRight(8) : "")}");
 
                     foreach (var attribute in tableTuple)
                     {
-                        Console.Write($"{attribute.Value.ToString().PadRight(widthReferences[index])}");
-                        index++;
+                        try
+                        {
+                            Console.Write($"{attribute.Value.ToString().PadRight(widthReferences[index])}");
+                            index++;
+                        }
+                        catch (Exception)
+                        {
+                            Console.Write($"{attribute.Value.ToString().PadRight(8)}");
+                            return;
+                        }
                     }
 
                     Console.WriteLine();
@@ -85,6 +94,16 @@ namespace Surly.Core.Functions
                 }
                 Console.WriteLine();
             }
+        }
+        public static void Print(this SurlyDatabase database, IList<string> query)
+        {
+            query.RemoveAt(0);
+
+            var tablesQueryResponse = query                
+                .Select(database.GetTable)
+                .ToList();                
+
+            database.PrintTables(tablesQueryResponse);
         }
 
         public static void PrintCatalog(this SurlyDatabase database)
@@ -170,5 +189,12 @@ namespace Surly.Core.Functions
                 Console.WriteLine();
             }
         }
+    }
+
+    public class SurlyTableResponse
+    {
+        public SurlyTable Table { get; set; }
+        public bool IsProjection { get; set; }
+        public bool HideIndexes { get; set; }
     }
 }

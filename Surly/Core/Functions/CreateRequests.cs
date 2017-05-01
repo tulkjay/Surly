@@ -26,13 +26,13 @@ namespace Surly.Core.Functions
 
             newTuple.AddLast(new SurlyAttribute
             {
-                Name = "ID",
+                Name = "Id",
                 Value = table.Tuples.Count + 1
             });
 
             for (var i = 0; i < schema.Length; i++)
             {
-                if (schema[i].Name == "ID")
+                if (schema[i].Name == "Id")
                 {
                     continue;
                 }
@@ -103,7 +103,7 @@ namespace Surly.Core.Functions
 
             database.Tables.Last.Value.Schema.AddFirst(new SurlyAttributeSchema
             {
-                Name = "ID",
+                Name = "Id",
                 Type = typeof(int),
                 Maximum = 3
             });

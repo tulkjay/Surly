@@ -8,5 +8,7 @@ namespace Surly.Core.Structure
         public LinkedList<SurlyAttributeSchema> AttributeNames { get; set; }
         public string TableName { get; set; }
         public LinkedList<LinkedList<SurlyAttribute>> Tuples { get; set; }
+
+        public bool HideIndex { get; set; }
     }
 }

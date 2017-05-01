@@ -23,18 +23,12 @@ namespace Surly.Core.Functions
             }
             if (line.ToUpper().Contains("SELECT"))
             {
-                var resultTable = database.HandleSelect(line);
-
-                if (resultTable)
-                    WriteLine("Success", Green);
+                database.Select(line);
                 return;
             }
             if (line.ToUpper().Contains("JOIN"))
             {
-                var success = database.Join(line);
-
-                if (success)
-                    WriteLine("Success", Green);
+                database.Join(line);
                 return;
             }
 
@@ -62,7 +56,7 @@ namespace Surly.Core.Functions
                         return;
                     }
 
-                    database.PrintTables(line.Replace(",", "").Replace(";", "").Split(' ').ToList());
+                    database.Print(line.Replace(",", "").Replace(";", "").Split(' ').ToList());
 
                     Set(Magenta);
                     break;

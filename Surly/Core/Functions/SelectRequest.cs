@@ -1,50 +1,163 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Surly.Core.Structure;
+using Surly.Helpers;
+using static System.ConsoleColor;
+using static Surly.Helpers.ConsoleInterface;
 
 namespace Surly.Core.Functions
 {
     public static class SelectRequest
     {
-        public static bool HandleSelect(this SurlyDatabase database, string query)
+        private static LinkedList<LinkedList<SurlyAttribute>> _resultSet;
+
+        public static void Select(this SurlyDatabase database, string query)
         {
-            var steps = query.ToUpper().Split(' ').ToList();
-            var selectNameRegex = new Regex("(\\w+) =").Match(query);
-
-            var selectName = selectNameRegex
-                .Groups[1]
-                .Captures[0]
-                .ToString()
-                .ToUpper()
-                .Trim();
-
-            var attributeNamesRegex = new Regex("select (.+) from", RegexOptions.IgnoreCase)
-                .Match(query)
-                .Groups[1]
-                .Captures[0]
-                .ToString()
-                .ToUpper()
-                .Split(',')
-                .ToList();
-
-            var attributeNames = new LinkedList<string>();
-
-            foreach (var name in attributeNamesRegex)
+            _resultSet = new LinkedList<LinkedList<SurlyAttribute>>();
+            string tableName, conditions, projectionName = null;
+            var printProjection = false;
+            try
             {
-                attributeNames.AddLast(name.Trim());
+                try
+                {
+                    projectionName = new Regex("(\\w+) = select", RegexOptions.IgnoreCase)
+                        .Match(query)
+                        .Groups[1]
+                        .Captures[0]
+                        .ToString()
+                        .ToUpper();
+                }
+                catch (Exception)
+                {
+                    printProjection = true;
+                }
+
+                tableName = new Regex("select (\\w+) where", RegexOptions.IgnoreCase)
+                    .Match(query)
+                    .Groups[1]
+                    .Captures[0]
+                    .ToString()
+                    .ToUpper();
+
+                conditions = new Regex("where (.+);", RegexOptions.IgnoreCase)
+                    .Match(query)
+                    .Groups[1]
+                    .Captures[0]
+                    .ToString()
+                    .ToUpper();
+
+            }
+            catch (Exception)
+            {
+                WriteLine("Invalid SELECT syntax, please see help", Red);
+                return;
             }
 
-            return false;
+            var tableResponse = database.GetTable(tableName);
+
+            if (tableResponse.Table == null)
+            {
+                WriteLine($"{tableName.ToUpper()} not found.", Red);
+                return;
+            }
+
+            if (printProjection
+                && SurlyProjections.GetInstance().Projections.Any(x => x.ProjectionName == projectionName))
+            {
+                WriteLine($"\n\t{projectionName?.ToUpper()} already exists, please choose a different name", Red);
+                return;
+            }
+
+            var conditionSteps = conditions.Split(' ').ToList();
+
+            tableResponse.Table.Tuples.ToList().ForEach(tableRow =>
+            {
+                var valid = Chain(tableRow, true, conditionSteps.ToArray(), 0);
+
+                if (valid)
+                {
+                    var trimmedRow = new LinkedList<SurlyAttribute>(tableRow);
+
+                    var rowId = trimmedRow.Single(x => x.Name == "Id");
+                    trimmedRow.Remove(rowId);
+
+                    _resultSet.AddLast(trimmedRow);
+                }
+            });
+
+            if (_resultSet.Count == 0)
+            {
+                WriteLine("\n\tQuery yielded no results.", Yellow);
+                return;
+            }
+
+            var schema = new LinkedList<SurlyAttributeSchema>(tableResponse.Table.Schema);
+            var id = schema.Single(x => x.Name == "Id");
+            schema.Remove(id);
+
+            if (printProjection)
+            {
+                var response = new SurlyTableResponse
+                {
+                    Table = new SurlyTable
+                    {
+                        Schema = schema,
+                        Name = "Results",
+                        Tuples = _resultSet
+                    },
+                    HideIndexes = true
+                };
+
+                database.PrintTables(new List<SurlyTableResponse> {response});
+
+                return;
+            }
+
+            SurlyProjections.GetInstance().Projections.AddLast(new SurlyProjection
+            {
+                AttributeNames = schema,
+                HideIndex = true,
+                ProjectionName = projectionName,
+                TableName = tableResponse.Table.Name,
+                Tuples = _resultSet
+            });
+
+            WriteLine($"\n\t{projectionName.ToUpper()} build successful.", Green);
         }
 
-        private static SurlyTable Handle(this SurlyTable resultSet, IEnumerable<string> query)
+        public static bool Chain(LinkedList<SurlyAttribute> row, bool previousValid, string[] conditionSet, int index)
         {
-            return null;
+            string attribute;
+            var result = false;
+            if (conditionSet.Length > index + 4)
+            {
+                result = Chain(row, previousValid, conditionSet, index + 4);
+            }
+            else
+            {
+                attribute = row.Single(x => x.Name.ToUpper() == conditionSet[index]).Value.ToString();
+
+                return OperatorHelper.ApplyCondition(attribute, conditionSet[index + 1], conditionSet[index + 2]);
+            }
+            attribute = row.Single(x => x.Name.ToUpper() == conditionSet[index]).Value.ToString();
+
+            var valid = OperatorHelper.ApplyCondition(attribute, conditionSet[index + 1], conditionSet[index + 2]);
+
+            switch (conditionSet[index + 3].ToUpper())
+            {
+                case "AND":
+                    valid = result && valid;
+                    break;
+                case "OR":
+                    valid = result || valid;
+                    break;
+                default:
+                    WriteLine("Invalid operation, please see help.", Red);
+                    return false;
+            }
+            return valid;              
         }
     }
 }

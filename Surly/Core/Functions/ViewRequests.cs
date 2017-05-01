@@ -78,10 +78,10 @@ namespace Surly.Core.Functions
         }
         private static SurlyProjection Validate(SurlyDatabase database, SurlyProjection projection)
         {
-            var table = database.GetTable(projection.TableName);
-            if (table == null) return null;
+            var tableResponse = database.GetTable(projection.TableName);
+            if (tableResponse == null) return null;
 
-            var validAttributes = projection.AttributeNames.All(attributeName => table.Schema.Any(x => x.Name == attributeName.Name));
+            var validAttributes = projection.AttributeNames.All(attributeName => tableResponse.Table.Schema.Any(x => x.Name == attributeName.Name));
 
             if (!validAttributes)
             {

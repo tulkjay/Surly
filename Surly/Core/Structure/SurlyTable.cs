@@ -10,7 +10,7 @@ namespace Surly.Core.Structure
             if (tuples != null) Tuples = tuples;
         }
 
-        public string Name { get; set; }
+        public string Name { get; set; }        
 
         public LinkedList<SurlyAttributeSchema> Schema { get; set; } = new LinkedList<SurlyAttributeSchema>();
 

@@ -64,11 +64,11 @@ namespace Surly.Core.Functions
                 var schemaDefinition = new LinkedList<SurlyAttributeSchema>();
                 var castedList = new LinkedList<LinkedList<SurlyAttribute>>();
 
-                var table = database.GetTable(tableName);
+                var tableResponse = database.GetTable(tableName);
 
                 foreach (var attributeName in attributeNames)
                 {
-                    var selectedTuplesSchemata = table.Schema.Single(x => x.Name == attributeName);
+                    var selectedTuplesSchemata = tableResponse.Table.Schema.Single(x => x.Name == attributeName);
 
                     schemaDefinition.AddLast(new SurlyAttributeSchema
                     {
@@ -77,7 +77,7 @@ namespace Surly.Core.Functions
                     });
                 }
 
-                var selectedTuples = table.Tuples
+                var selectedTuples = tableResponse.Table.Tuples
                     .Select(x => x
                         .Where(y => attributeNames
                             .Any(a => a == y.Name)));
@@ -109,11 +109,11 @@ namespace Surly.Core.Functions
 
         public static SurlyProjection Validate(SurlyDatabase database, SurlyProjection projection)
         {
-            var table = database.GetTable(projection.TableName);
-            if (table == null) return null;
+            var tableResponse = database.GetTable(projection.TableName);
+            if (tableResponse == null) return null;
 
             var validAttributes =
-                projection.AttributeNames.All(attributeName => table.Schema.Any(x => x.Name == attributeName.Name));
+                projection.AttributeNames.All(attributeName => tableResponse.Table.Schema.Any(x => x.Name == attributeName.Name));
 
             if (!validAttributes)
             {
