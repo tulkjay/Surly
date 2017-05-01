@@ -173,7 +173,7 @@ namespace Surly.Helpers
 
         private static void PrintNewQuerySection()
         {
-            WriteLine("\n('help' to display help, 'exit' to go to menu)", Yellow, Magenta);
+            WriteLine("\n\n('help' to display help, 'exit' to go to menu)", DarkYellow, Magenta);
 
             Console.Write("\nEnter a query: \n\t> ");
 
@@ -188,8 +188,11 @@ namespace Surly.Helpers
                 "INSERT <table-name> <attribute-value-n> <attribute-value-n + 1> ... ;",
                 "PRINT <table-name>, ... ;", 
                 "DELETE <table-name>;",
+                "DELETE <table-name> WHERE <condition> AND/OR <condition> AND/OR ...;",
                 "DESTROY <table-name>;",
+                "<selection-name> = SELECT <table-name> WHERE <condition> AND/OR <condition> AND/OR ...;",
                 "<projection-name> = PROJECT <attribute-name>, <attribute-name>, ... FROM <table-name>;",
+                "<join-name> = JOIN <table-name>, <table-name> ON <join-condition>;",
                 "<view-name> = VIEW <attribute-name>, <attribute-name>, ... FROM <table-name>;"
             };
 

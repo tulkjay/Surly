@@ -18,20 +18,20 @@ namespace Surly.Core.Functions
 
             if (projection == null)
             {
-                WriteLine("Error adding projection", Red);
+                WriteLine("\n\tError adding projection", Red);
                 return;
             }
 
             if (ProjectionsContainer.Projections.Any(x => x.ProjectionName == projection.ProjectionName))
             {
                 WriteLine(
-                    $"Projection {projection.ProjectionName.ToUpper()} already exists, please try a different name.",
+                    $"\n\tProjection {projection.ProjectionName.ToUpper()} already exists, please try a different name.",
                     Red);
                 return;
             }
 
             ProjectionsContainer.Projections.AddLast(projection);
-            WriteLine($"{projection.ProjectionName.ToUpper()} build successful", Green);
+            WriteLine($"\n\t{projection.ProjectionName.ToUpper()} build successful", Green);
         }
 
         public static SurlyProjection CreateJoinProjection(SurlyDatabase database, string query)
@@ -60,7 +60,7 @@ namespace Surly.Core.Functions
                     .Split(',')
                     .ToList();
 
-                joinCondition = new Regex("on (.+);", RegexOptions.IgnoreCase)
+                joinCondition = new Regex(" on (.+);", RegexOptions.IgnoreCase)
                     .Match(query)
                     .Groups[1]
                     .Captures[0]
@@ -71,7 +71,7 @@ namespace Surly.Core.Functions
             }
             catch (Exception)
             {
-                Console.WriteLine("Invalid syntax for JOIN, see help.");
+                Console.WriteLine("\n\tInvalid syntax for JOIN, see help.");
                 return null;
             }
 
@@ -91,14 +91,14 @@ namespace Surly.Core.Functions
                     WriteLine($"{tableName.Trim()} not found", Red);
                     return null;
                 }                
-
-                attributeNames.Combine(tempTableResponse.Table.Schema);
+                
+                attributeNames.Combine(new LinkedList<SurlyAttributeSchema>(tempTableResponse.Table.Schema));
 
                 tables.Add(tempTableResponse.Table);
             }
 
-            var leftTableRows = tables[0].Tuples.ToList();
-            var rightTableRows = tables[1].Tuples;
+            var leftTableRows = new LinkedList<LinkedList<SurlyAttribute>>(tables[0].Tuples).ToList();
+            var rightTableRows = new LinkedList<LinkedList<SurlyAttribute>>(tables[1].Tuples);
 
             leftTableRows.ForEach(
                 row => resultSet = resultSet.Combine(row.ApplyCondition(rightTableRows, joinCondition)));
@@ -118,6 +118,8 @@ namespace Surly.Core.Functions
 
         public static LinkedList<T> Combine<T>(this LinkedList<T> baseList, LinkedList<T> newList)
         {
+            if(newList == null) return null;
+
             foreach (var surlyAttribute in newList)
             {
                 if (typeof(T) == typeof(SurlyAttribute) || typeof(T) == typeof(SurlyAttributeSchema))
@@ -140,7 +142,7 @@ namespace Surly.Core.Functions
         {
             if (condition.Length != 3)
             {
-                WriteLine("Invalid syntax for JOIN condition, please see help", Red);
+                WriteLine("\n\tInvalid syntax for JOIN condition, please see help", Red);
                 return null;
             }
 

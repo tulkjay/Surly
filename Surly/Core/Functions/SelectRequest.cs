@@ -80,7 +80,7 @@ namespace Surly.Core.Functions
                 {
                     var trimmedRow = new LinkedList<SurlyAttribute>(tableRow);
 
-                    var rowId = trimmedRow.Single(x => x.Name == "Id");
+                    var rowId = trimmedRow.SingleOrDefault(x => x.Name == "Id");
                     trimmedRow.Remove(rowId);
 
                     _resultSet.AddLast(trimmedRow);
@@ -94,7 +94,7 @@ namespace Surly.Core.Functions
             }
 
             var schema = new LinkedList<SurlyAttributeSchema>(tableResponse.Table.Schema);
-            var id = schema.Single(x => x.Name == "Id");
+            var id = schema.SingleOrDefault(x => x.Name == "Id");
             schema.Remove(id);
 
             if (printProjection)
